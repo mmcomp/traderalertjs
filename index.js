@@ -44,9 +44,14 @@ async function start(){
     // await alertIndicatorLogic.init()
     // console.log(alertIndicatorLogic)
     // taapiReaderClass.getIndicator("macd", "binance", "BTC/USDT", "4h")
-    console.info('Updating Currency : ')
-    console.info( await binanceReaderClass.getFuturesPrices() );
-    setTimeout(start, 10000)
+    try{
+      console.info('Updating Currency : ')
+      console.info( await binanceReaderClass.getFuturesPrices() );
+    }catch(e){
+      console.error('Binance Error', e)
+    }
+
+    setTimeout(start, process.env.INTERVAL)
 }
 
 start()

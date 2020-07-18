@@ -1,6 +1,7 @@
 'use strict'
 
 const { Model } = require('objection')
+const User = require('./users.model')
  
 class AlertLimit extends Model {
   static get tableName () {
@@ -14,6 +15,17 @@ class AlertLimit extends Model {
 
   $beforeUpdate(context) {
     this.updated_at = new Date().toISOString()
+  }
+
+  static relationMappings = {
+    user: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: User,
+      join: {
+        from: 'alert_limits.users_id',
+        to: 'users.id'
+      }
+    }
   }
 }
  

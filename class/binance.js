@@ -1,8 +1,10 @@
 'use strict'
 
-const CurrencyCache = require('../models/currency_caches.model')
+// const CurrencyCache = require('../models/currency_caches.model')
 const Currency = require('../models/currencies.model')
 const AlertLimit = require('../models/alert_limits.model')
+
+const { exec } = require("child_process")
 
 class BinanceReaderClass {
     constructor (client){
@@ -36,16 +38,27 @@ class BinanceReaderClass {
             try{
                 let output = {}
                 let result = await client.futuresPrices()
-                let currencyCashes = await CurrencyCache.query().select('currency').then(items => items.map(it => it.currency))
-                // console.log(currencyCashes)
+                // let currencyCashes = await CurrencyCache.query().select('currency').then(items => items.map(it => it.currency))
+                const currencies = await Currency.query().select('name', 'id').where('enabled', 'yes')//.then(items => items.map(it => it.name.replace('/', '')))
+                let selectedCurrencies = {}
+                for(let curr of currencies){
+                    let nm = curr.name
+                    selectedCurrencies[nm.replace('/', '')] = {
+                        id: curr.id,
+                        name: curr.name,
+                    }
+                }
+                // console.log(selectedCurrencies)
+                
                 for(let currency in result){
                     // console.log('Currency : ', currency, 'Price: ', result[currency])
-                    if(currencyCashes.indexOf(currency)>=0){
-                        that.updateCurrency(currency, result[currency]).then().catch()
-                        output[currency] =parseFloat(result[currency])
+                    if(selectedCurrencies[currency]){
+                        that.updateCurrency(selectedCurrencies[currency].name, result[currency]).then().catch()
+                        output[selectedCurrencies[currency].name] = parseFloat(result[currency])
                     }
                 }
                 that.findAlerts(output)
+                
                 resolve(output)
             }catch(e){
                 reject(e)
@@ -81,10 +94,11 @@ class BinanceReaderClass {
             }
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
             // console.log(currentDate, currentTime)
-            const alerts = await AlertLimit.query()
+            const alerts = await AlertLimit.query().withGraphFetched('user')
                 .where('sent', false)
                 .where('expire_date', '>', currentDate)
                 .whereIn('currency', selectedCurrencies)
+                
             // console.log('Alerts', alerts)
             let doAlerts = []
             for(const alert of alerts){
@@ -106,15 +120,31 @@ class BinanceReaderClass {
 
     async sendAlerts(doAlerts){
         return new Promise(async function(resolve, reject){
-            // console.log('Sending Alerts', doAlerts)
+            console.log('Sending Alerts', doAlerts)
             for(const alert of doAlerts) {
                 if(alert.notification=='single'){
-                    // console.log('update alert!')
+                    console.log('update alert!')
                     AlertLimit.query().patch({
                         sent: true,
                     }).where('id', alert.id).then().catch()
+
+                    if(alert.user.telegram_id){
+                        console.log(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                        exec(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderr) {
+                                console.log(`stderr: ${stderr}`);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                        });
+                    }
                 }
             }
+
             resolve()
         })
     }
