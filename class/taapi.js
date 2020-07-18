@@ -1,4 +1,4 @@
-class ReaderClass {
+class TaapiReaderClass {
     constructor (client){
         this.client = client
     }
@@ -18,4 +18,4 @@ class ReaderClass {
 }
 
 
-module.exports = ReaderClass
+module.exports = TaapiReaderClass
