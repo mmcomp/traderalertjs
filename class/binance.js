@@ -130,8 +130,9 @@ class BinanceReaderClass {
                 }
                 
                 if(alert.user.telegram_id){
-                    console.log(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
-                    exec(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                    const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                    console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                    exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
                         if (error) {
                             console.log(`error: ${error.message}`);
                             return;
