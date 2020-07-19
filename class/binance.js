@@ -106,7 +106,7 @@ class BinanceReaderClass {
                     doAlerts.push(alert)
                 }else if(alert.target_price>currencies[alert.currency] && alert.type=='down'){
                     doAlerts.push(alert)
-                }else if(alert.target_price!=currencies[alert.currency] && alert.type=='cross'){
+                }else if(alert.target_price==currencies[alert.currency] && alert.type=='cross'){
                     doAlerts.push(alert)
                 }
             }
