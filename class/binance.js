@@ -127,21 +127,21 @@ class BinanceReaderClass {
                     AlertLimit.query().patch({
                         sent: true,
                     }).where('id', alert.id).then().catch()
-
-                    if(alert.user.telegram_id){
-                        console.log(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
-                        exec(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
-                            if (error) {
-                                console.log(`error: ${error.message}`);
-                                return;
-                            }
-                            if (stderr) {
-                                console.log(`stderr: ${stderr}`);
-                                return;
-                            }
-                            console.log(`stdout: ${stdout}`);
-                        });
-                    }
+                }
+                
+                if(alert.user.telegram_id){
+                    console.log(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                    exec(`${process.env.BASE_COMMAND} "Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                        if (error) {
+                            console.log(`error: ${error.message}`);
+                            return;
+                        }
+                        if (stderr) {
+                            console.log(`stderr: ${stderr}`);
+                            return;
+                        }
+                        console.log(`stdout: ${stdout}`);
+                    });
                 }
             }
 
