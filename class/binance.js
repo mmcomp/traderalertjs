@@ -39,7 +39,7 @@ class BinanceReaderClass {
             try{
                 let output = {}
                 let result = []
-                const cachePath = `C:\\Users\\mirsamie\\Documents\\traderalertjs\\cache\\Binance_getFuturesPrices.json`
+                const cachePath = process.env.CACHE_PATH
                 if(process.env.IS_TEST && fs.existsSync(cachePath))
                     result = fs.readFileSync(cachePath)
                 else{
