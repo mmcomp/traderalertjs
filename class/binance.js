@@ -1,6 +1,7 @@
 'use strict'
 
 // const CurrencyCache = require('../models/currency_caches.model')
+const fs = require('fs')
 const Currency = require('../models/currencies.model')
 const AlertLimit = require('../models/alert_limits.model')
 
@@ -37,7 +38,18 @@ class BinanceReaderClass {
         return new Promise(async function(resolve, reject){
             try{
                 let output = {}
-                let result = await client.futuresPrices()
+                let result = []
+                const cachePath = `C:\\Users\\mirsamie\\Documents\\traderalertjs\\cache\\Binance_getFuturesPrices.json`
+                if(process.env.IS_TEST && fs.existsSync(cachePath))
+                    result = fs.readFileSync(cachePath)
+                else{
+                    result = await client.futuresPrices()
+                    if(process.env.IS_TEST){
+                        const dataToStore = JSON.stringify(result)
+                        fs.writeFileSync(cachePath,  dataToStore)
+                    }
+                }
+
                 // let currencyCashes = await CurrencyCache.query().select('currency').then(items => items.map(it => it.currency))
                 const currencies = await Currency.query().select('name', 'id').where('enabled', 'yes')//.then(items => items.map(it => it.name.replace('/', '')))
                 let selectedCurrencies = {}
