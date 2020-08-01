@@ -112,16 +112,20 @@ class BinanceReaderClass {
                 .where('expire_date', '>', currentDate)
                 .whereIn('currency', selectedCurrencies)
                 
-            // console.log('Alerts', alerts)
+            console.log('Alerts', alerts)
             let doAlerts = []
             for(const alert of alerts){
+		console.log('Check alert:', alert.id, alert.target_price, currencies[alert.currency], alert.type)
                 if(alert.target_price<currencies[alert.currency] && alert.type=='up'){
+		    console.log('UP')
                     alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price>currencies[alert.currency] && alert.type=='down'){
+		    console.log('DOWN')
                     alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price==currencies[alert.currency] && alert.type=='cross'){
+		    console.log('CROSS')
                     alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }
@@ -147,11 +151,11 @@ class BinanceReaderClass {
                 
                 const alertLimitl = await AlertLimitLog.query()
                                         .where('alert_limits_id', alert.id)
-                                        .where('price', alert.alert_price)
+                                        .where('alerted_price', alert.alert_price)
                                         .first()
 
-            
-                if(alert.user.telegram_id){ //&& alertLimitLog){
+           	console.log(alertLimitl) 
+                if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                     console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
                     exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
@@ -164,6 +168,10 @@ class BinanceReaderClass {
                             return;
                         }
                         console.log(`stdout: ${stdout}`);
+			AlertLimitLog.query().insert({
+				alert_limits_id: alert.id,
+				alerted_price: alert.alert_price
+			}).then(res => console.log('add', res)).catch(e => console.log('err', e))
                     });
                 }
             }
