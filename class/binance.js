@@ -43,7 +43,7 @@ class BinanceReaderClass {
 
                 const cachePath = process.env.CACHE_PATH
                 if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
-                    result = fs.readFileSync(cachePath)
+                    result = JSON.parse(fs.readFileSync(cachePath))
                 else{
                     result = await client.prices()
                     if(process.env.IS_TEST!='false'){
@@ -52,7 +52,7 @@ class BinanceReaderClass {
                     }
                 }
 
-                console.log('New Data : ', result.toString())
+                console.log('New Data : ', result)
 
                 const currencies = await Currency.query().select('name', 'id').where('enabled', 'yes')//.then(items => items.map(it => it.name.replace('/', '')))
                 let selectedCurrencies = {}
