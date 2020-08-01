@@ -150,7 +150,8 @@ class BinanceReaderClass {
                                         .where('price', alert.alert_price)
                                         .first()
 
-                if(alert.user.telegram_id && alertLimitLog){
+            
+                if(alert.user.telegram_id) //&& alertLimitLog){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                     console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
                     exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
