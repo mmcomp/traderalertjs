@@ -145,13 +145,13 @@ class BinanceReaderClass {
                     }).where('id', alert.id).then().catch()
                 }
                 
-                const alertLimitLog = await AlertLimitLog.query()
+                const alertLimitl = await AlertLimitLog.query()
                                         .where('alert_limits_id', alert.id)
                                         .where('price', alert.alert_price)
                                         .first()
 
             
-                if(alert.user.telegram_id) //&& alertLimitLog){
+                if(alert.user.telegram_id){ //&& alertLimitLog){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                     console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
                     exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
