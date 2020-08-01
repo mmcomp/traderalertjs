@@ -4,6 +4,7 @@
 const fs = require('fs')
 const Currency = require('../models/currencies.model')
 const AlertLimit = require('../models/alert_limits.model')
+const AlertLimitLog = require('../models/alert_limit_logs.model')
 
 const { exec } = require("child_process")
 
@@ -39,18 +40,20 @@ class BinanceReaderClass {
             try{
                 let output = {}
                 let result = []
+
                 const cachePath = process.env.CACHE_PATH
-                if(process.env.IS_TEST && fs.existsSync(cachePath))
+                if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
                     result = fs.readFileSync(cachePath)
                 else{
-                    result = await client.futuresPrices()
-                    if(process.env.IS_TEST){
+                    result = await client.prices()
+                    if(process.env.IS_TEST!='false'){
                         const dataToStore = JSON.stringify(result)
                         fs.writeFileSync(cachePath,  dataToStore)
                     }
                 }
 
-                // let currencyCashes = await CurrencyCache.query().select('currency').then(items => items.map(it => it.currency))
+                // console.log('New Data : ', result)
+
                 const currencies = await Currency.query().select('name', 'id').where('enabled', 'yes')//.then(items => items.map(it => it.name.replace('/', '')))
                 let selectedCurrencies = {}
                 for(let curr of currencies){
@@ -60,10 +63,8 @@ class BinanceReaderClass {
                         name: curr.name,
                     }
                 }
-                // console.log(selectedCurrencies)
                 
                 for(let currency in result){
-                    // console.log('Currency : ', currency, 'Price: ', result[currency])
                     if(selectedCurrencies[currency]){
                         that.updateCurrency(selectedCurrencies[currency].name, result[currency]).then().catch()
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
@@ -115,10 +116,13 @@ class BinanceReaderClass {
             let doAlerts = []
             for(const alert of alerts){
                 if(alert.target_price<currencies[alert.currency] && alert.type=='up'){
+                    alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price>currencies[alert.currency] && alert.type=='down'){
+                    alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price==currencies[alert.currency] && alert.type=='cross'){
+                    alert['alert_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }
             }
@@ -141,7 +145,12 @@ class BinanceReaderClass {
                     }).where('id', alert.id).then().catch()
                 }
                 
-                if(alert.user.telegram_id){
+                const alertLimitLog = await AlertLimitLog.query()
+                                        .where('alert_limits_id', alert.id)
+                                        .where('price', alert.alert_price)
+                                        .first()
+
+                if(alert.user.telegram_id && alertLimitLog){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                     console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
                     exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
