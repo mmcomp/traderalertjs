@@ -52,7 +52,7 @@ class BinanceReaderClass {
                     }
                 }
 
-                console.log('New Data : ', result)
+                // console.log('New Data : ', result)
 
                 const currencies = await Currency.query().select('name', 'id').where('enabled', 'yes')//.then(items => items.map(it => it.name.replace('/', '')))
                 let selectedCurrencies = {}
