@@ -98,6 +98,7 @@ class BinanceReaderClass {
 
     async findAlerts(currencies){
         const that = this
+        console.log('currencies', currencies)
         return new Promise(async function(resolve, reject){
             let selectedCurrencies = []
             for(let currency in currencies){
@@ -105,6 +106,7 @@ class BinanceReaderClass {
                     selectedCurrencies.push(currency)
                 }
             }
+            console.log('Selected Currency', selectedCurrencies)
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
             // console.log(currentDate, currentTime)
             const alerts = await AlertLimit.query().withGraphFetched('user')
@@ -115,24 +117,49 @@ class BinanceReaderClass {
             console.log('Alerts', alerts)
             let doAlerts = []
             for(const alert of alerts){
-		console.log('Check alert:', alert.id, alert.target_price, currencies[alert.currency], alert.type)
+                console.log('Check alert:', alert.id, alert.target_price, currencies[alert.currency], alert.type)
+                const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
+                console.log('has old!', alertLimitl)
+                if(typeof alertLimitl!='undefined'){
+                    if((alert.type=='up' && currencies[alert.currency]<alert.target_price) || 
+                        (alert.type=='down' && currencies[alert.currency]>alert.target_price)){
+                        alert['alerted_price'] = currencies[alert.currency]
+                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        continue
+                    }
+                    if((alert.type=='up' && currencies[alert.currency]>alert.target_price && alertLimitl.alerted_price>alert.target_price) || 
+                        (alert.type=='down' && currencies[alert.currency]<alert.target_price && alertLimitl.alerted_price<alert.target_price)){
+                        alert['alerted_price'] = currencies[alert.currency]
+                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        continue
+                    }
+                    console.log(currencies[alert.currency], alert.target_price, alertLimitl.alerted_price)
+                    if(alert.type=='cross' && ((currencies[alert.currency]>alert.target_price && alertLimitl.alerted_price>alert.target_price) || (currencies[alert.currency]<alert.target_price && alertLimitl.alerted_price<alert.target_price))){
+                        console.log('CROSS!')
+                        alert['alerted_price'] = currencies[alert.currency]
+                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        continue
+                    }else{
+                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{}).catch(e=>{})
+                    }
+                }
                 if(alert.target_price<currencies[alert.currency] && alert.type=='up'){
-		    console.log('UP')
-                    alert['alert_price'] = currencies[alert.currency]
+		            console.log('UP')
+                    alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price>currencies[alert.currency] && alert.type=='down'){
-		    console.log('DOWN')
-                    alert['alert_price'] = currencies[alert.currency]
+		            console.log('DOWN')
+                    alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
-                }else if(alert.target_price==currencies[alert.currency] && alert.type=='cross'){
-		    console.log('CROSS')
-                    alert['alert_price'] = currencies[alert.currency]
+                }else if(alert.target_price!=currencies[alert.currency] && alert.type=='cross'){
+		            console.log('CROSS')
+                    alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }
             }
             // console.log('Do Alerts', doAlerts)
             if(doAlerts.length>0){
-                that.sendAlerts(doAlerts).then().catch()
+                that.sendAlerts(doAlerts).then().catch(e => {console.log('send alerts error: ', e)})
             }
             resolve()
         })
@@ -149,12 +176,9 @@ class BinanceReaderClass {
                     }).where('id', alert.id).then().catch()
                 }
                 
-                const alertLimitl = await AlertLimitLog.query()
-                                        .where('alert_limits_id', alert.id)
-                                        .where('alerted_price', alert.alert_price)
-                                        .first()
+                const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).where('alerted_price', alert.alerted_price).first()
 
-           	console.log(alertLimitl) 
+           	    console.log(alertLimitl) 
                 if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                     console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
@@ -168,10 +192,7 @@ class BinanceReaderClass {
                             return;
                         }
                         console.log(`stdout: ${stdout}`);
-			AlertLimitLog.query().insert({
-				alert_limits_id: alert.id,
-				alerted_price: alert.alert_price
-			}).then(res => console.log('add', res)).catch(e => console.log('err', e))
+                        AlertLimitLog.logAlertLimit(alert).then(res => console.log('add', res)).catch(e => console.log('err', e))
                     });
                 }
             }

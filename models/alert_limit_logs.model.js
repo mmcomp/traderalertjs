@@ -18,6 +18,12 @@ class AlertLimitLog extends Model {
     this.updated_at = new Date().toISOString()
   }
 
+  static async logAlertLimit(alertLimit){
+    alertLimit.alert_limits_id = alertLimit.id
+    delete alertLimit.id
+    return await AlertLimitLog.query().insert(alertLimit)
+  }
+
   static relationMappings = {
     user: {
       relation: Model.BelongsToOneRelation,
