@@ -183,8 +183,18 @@ class BinanceReaderClass {
            	    console.log(alertLimitl) 
                 if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                    console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
-                    exec(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                    let msg = `♦️ ${alert.currency} 
+
+                    ⚠️ Limits Alert 
+                    
+                    🔊 ${alert.type} ${alert.target_price}
+                    
+                    💰 Current Price: ${alert.alerted_price}
+                    
+                    🕑 ${currentDate} ${currentTime}`
+                    // console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                    // let msg = `${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}`
+                    exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
                         if (error) {
                             console.log(`error: ${error.message}`);
                             return;
