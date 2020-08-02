@@ -111,7 +111,9 @@ class BinanceReaderClass {
             // console.log(currentDate, currentTime)
             const alerts = await AlertLimit.query().withGraphFetched('user')
                 .where('sent', false)
-                .where('expire_date', '>', currentDate)
+                .where(function(query) {
+                    query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
+                })
                 .whereIn('currency', selectedCurrencies)
                 
             console.log('Alerts', alerts)
