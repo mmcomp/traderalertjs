@@ -7,6 +7,8 @@ const AlertLimit = require('../models/alert_limits.model')
 const AlertLimitLog = require('../models/alert_limit_logs.model')
 
 const { exec } = require("child_process")
+const AlertArea = require('../models/alert_areas.model')
+const AlertAreaLog = require('../models/alert_area_logs.model')
 
 class BinanceReaderClass {
     constructor (client){
@@ -108,20 +110,20 @@ class BinanceReaderClass {
             }
             console.log('Selected Currency', selectedCurrencies)
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-            // console.log(currentDate, currentTime)
-            const alerts = await AlertLimit.query().withGraphFetched('user')
+            // Alert Limit
+            let alerts = await AlertLimit.query().withGraphFetched('user')
                 .where('sent', false)
                 .where(function(query) {
                     query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
                 })
                 .whereIn('currency', selectedCurrencies)
                 
-            console.log('Alerts', alerts)
+            // console.log('Alerts', alerts)
             let doAlerts = []
             for(const alert of alerts){
-                console.log('Check alert:', alert.id, alert.target_price, currencies[alert.currency], alert.type)
+                // console.log('Check alert:', alert.id, alert.target_price, currencies[alert.currency], alert.type)
                 const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
-                console.log('has old!', alertLimitl)
+                // console.log('has old!', alertLimitl)
                 if(typeof alertLimitl!='undefined'){
                     if((alert.type=='up' && currencies[alert.currency]<alert.target_price) || 
                         (alert.type=='down' && currencies[alert.currency]>alert.target_price)){
@@ -146,20 +148,55 @@ class BinanceReaderClass {
                     }
                 }
                 if(alert.target_price<currencies[alert.currency] && alert.type=='up'){
-		            console.log('UP')
+		            // console.log('UP')
                     alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price>currencies[alert.currency] && alert.type=='down'){
-		            console.log('DOWN')
+		            // console.log('DOWN')
                     alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }else if(alert.target_price!=currencies[alert.currency] && alert.type=='cross'){
-		            console.log('CROSS')
+		            // console.log('CROSS')
                     alert['alerted_price'] = currencies[alert.currency]
                     doAlerts.push(alert)
                 }
             }
-            // console.log('Do Alerts', doAlerts)
+
+            // Alert Area
+            alerts = await AlertArea.query().withGraphFetched('user')
+                .where('sent', false)
+                .where(function(query) {
+                    query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
+                })
+                .whereIn('currency', selectedCurrencies)
+
+            for(const alert of alerts){
+                console.log('Check area:', alert.id, alert.change_percent, currencies[alert.currency], alert.price)
+                const alertLimitl = await AlertAreaLog.query().where('alert_areas_id', alert.id).first()
+                console.log('has old!', alertLimitl)
+                if(typeof alertLimitl!='undefined'){
+                    console.log('now price', currencies[alert.currency])
+                    console.log('target price', alert.price)
+                    console.log('chage percent', alert.change_percent)
+                    console.log('alerted price', alertLimitl.alerted_price)
+                    alert.alerted_price = alertLimitl.alerted_price
+                    let upPrice = alert.price * (1 + alert.change_percent/100)
+                    let downPrice = alert.price * (1 - alert.change_percent/100)
+                    console.log('up', upPrice)
+                    console.log('down', downPrice)
+                    if((currencies[alert.currency]>upPrice && alertLimitl.alerted_price<upPrice) || 
+                        (currencies[alert.currency]<upPrice && alertLimitl.alerted_price>upPrice) ||
+                        (currencies[alert.currency]>downPrice && alertLimitl.alerted_price<downPrice) || 
+                        (currencies[alert.currency]<downPrice && alertLimitl.alerted_price>downPrice) ){
+                        console.log('AREA!')
+                        alert['alerted_price'] = currencies[alert.currency]
+                        doAlerts.push(alert)
+                    }
+                }
+                AlertAreaLog.query().where('alert_areas_id', alert.id).delete().then(res=>{AlertAreaLog.logAlertArea(alert)}).catch(e=>{console.log(e)})
+            }
+    
+            console.log('Do Alerts', doAlerts)
             if(doAlerts.length>0){
                 that.sendAlerts(doAlerts).then().catch(e => {console.log('send alerts error: ', e)})
             }
@@ -171,20 +208,21 @@ class BinanceReaderClass {
         return new Promise(async function(resolve, reject){
             console.log('Sending Alerts', doAlerts)
             for(const alert of doAlerts) {
-                if(alert.notification=='single'){
-                    console.log('update alert!')
-                    AlertLimit.query().patch({
-                        sent: true,
-                    }).where('id', alert.id).then().catch()
-                }
-                
-                const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).where('alerted_price', alert.alerted_price).first()
-
-           	    console.log(alertLimitl) 
-                if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
-                    const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-
+                if(alert.target_price){
+                    if(alert.notification=='single'){
+                        console.log('update alert!')
+                        AlertLimit.query().patch({
+                            sent: true,
+                        }).where('id', alert.id).then().catch()
+                    }
+                    
+                    const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).where('alerted_price', alert.alerted_price).first()
+    
+                       console.log(alertLimitl) 
+                    if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
+                        const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
 ⚠️ Limits Alert 
 
 🔊 ${alert.type} ${alert.target_price}
@@ -192,21 +230,60 @@ class BinanceReaderClass {
 💰 Current Price: ${alert.alerted_price}
 
 🕑 ${currentDate} ${currentTime}`
-                    // console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
-                    // let msg = `${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}`
-                    exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
-                        if (error) {
-                            console.log(`error: ${error.message}`);
-                            return;
-                        }
-                        if (stderr) {
-                            console.log(`stderr: ${stderr}`);
-                            return;
-                        }
-                        console.log(`stdout: ${stdout}`);
-                        AlertLimitLog.logAlertLimit(alert).then(res => console.log('add', res)).catch(e => console.log('err', e))
-                    });
+                        // console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                        // let msg = `${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}`
+                        exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderr) {
+                                console.log(`stderr: ${stderr}`);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                            AlertLimitLog.logAlertLimit(alert).then(res => console.log('add', res)).catch(e => console.log('err', e))
+                        });
+                    }
+                }else{
+                    if(alert.notification=='single'){
+                        console.log('update alert!')
+                        AlertArea.query().patch({
+                            sent: true,
+                        }).where('id', alert.id).then().catch()
+                    }
+                    
+                    const alertLimitl = await AlertAreaLog.query().where('alert_areas_id', alert.id).where('alerted_price', alert.alerted_price).first()
+    
+                    console.log(alertLimitl) 
+                    if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
+                        const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Areas Alert 
+
+🔊 ${alert.change_percent}% ${alert.price}
+
+💰 Current Price: ${alert.alerted_price}
+
+🕑 ${currentDate} ${currentTime}`
+                        // console.log(`${process.env.BASE_COMMAND} "${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}" --chat_id=${alert.user.telegram_id}`)
+                        // let msg = `${currentDate} ${currentTime} : Limits Alert ${alert.currency} ${alert.type} on ${alert.target_price}`
+                        exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                            if (error) {
+                                console.log(`error: ${error.message}`);
+                                return;
+                            }
+                            if (stderr) {
+                                console.log(`stderr: ${stderr}`);
+                                return;
+                            }
+                            console.log(`stdout: ${stdout}`);
+                            AlertAreaLog.logAlertArea(alert).then(res => console.log('add', res)).catch(e => console.log('err', e))
+                        });
+                    }
                 }
+
             }
 
             resolve()
