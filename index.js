@@ -43,13 +43,16 @@ async function start(){
     // const alertIndicatorLogic = new AlertIndicatorLogic()
     // await alertIndicatorLogic.init()
     // console.log(alertIndicatorLogic)
-    // taapiReaderClass.getIndicator("macd", "binance", "BTC/USDT", "4h")
-    try{
-      console.info('Updating Currency : ')
-      console.info( await binanceReaderClass.getFuturesPrices() );
-    }catch(e){
-      console.error('Binance Error', e)
-    }
+    // console.log(await taapiReaderClass.rsi("BTC/USDT"))
+
+    await taapiReaderClass.readAlerts()
+
+    // try{
+    //   console.info('Updating Currency : ')
+    //   console.info( await binanceReaderClass.getFuturesPrices() );
+    // }catch(e){
+    //   console.error('Binance Error', e)
+    // }
 
     setTimeout(start, process.env.INTERVAL)
 }
