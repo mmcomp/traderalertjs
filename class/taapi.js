@@ -75,7 +75,7 @@ class TaapiReaderClass {
     
 🔊 ${alert.indicator}
     
-💰 Current Value: ${result.value}
+💰 Current Value: ${JSON.stringify(result)}
     
 🕑 ${currentDate} ${currentTime}`
                     exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
