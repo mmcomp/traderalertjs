@@ -77,7 +77,7 @@ class TaapiReaderClass {
         
 ⚠️ Indicator Alert 
     
-🔊 ${alert.indicator}
+🔊 ${alert.indicator} [${alert.timeframe}]
     
 💰 Current Value: ${value}
     
