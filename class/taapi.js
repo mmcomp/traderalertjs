@@ -65,41 +65,57 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, result) {
-        if((result.value == process.env.INDICATOR_MAX || result.value == process.env.INDICATOR_MIN)) {
-            for(const alert of alerts) {
-                if(alert.user.telegram_id) {
-                    const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                    let value = JSON.stringify(result)
-                    if(alert.indicator=='rsi') {
-                        value = result.value
-                    }
+        for(const alert of alerts) {
+            if(alert.user.telegram_id) {
+                const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                if(alert.indicator=='rsi' && (result.value == process.env.INDICATOR_MAX || result.value == process.env.INDICATOR_MIN)) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-        
-⚠️ Indicator Alert 
     
+⚠️ Indicator Alert RSI
+
 🔊 ${alert.indicator} [${alert.timeframe}]
-    
-💰 Current Value: ${value}
-    
+
+💰 Current Value: ${result.value}
+
 🕑 ${currentDate} ${currentTime}`
-                    exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
-                        if (error) {
-                            console.log(`error: ${error.message}`);
-                            return;
-                        }
-                        if (stderr) {
-                            console.log(`stderr: ${stderr}`);
-                            return;
-                        }
-                        console.log(`stdout: ${stdout}`);
-                        if(alert.notification=='single')
-                            AlertIndicator.query().where('id', alert.id).update({
-                                sent: true
-                            }).then().catch()
-                    });
+                    this.sendMessage(alert, msg, AlertIndicator)
+                } else if(alert.indicator=='macd' && (result.valueMACD == result.valueMACDSignal || result.valueMACD == result.valueMACDHist)) {
+                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Indicator Alert MACD
+
+🔊 ${alert.indicator} [${alert.timeframe}]
+
+💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
+
+🕑 ${currentDate} ${currentTime}`
+                    this.sendMessage(alert, msg, AlertIndicator)
                 }
             }
         }
+    }
+
+    async sendMessage(alert, msg, alertClass) {
+        return new Promise(function(resolve, reject){
+            exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`error: ${error.message}`);
+                    reject()
+                    return
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                    reject()
+                    return
+                }
+                console.log(`stdout: ${stdout}`);
+                if(alert.notification=='single')
+                    alertClass.query().where('id', alert.id).update({
+                        sent: true
+                    }).then().catch()
+                resolve()
+            });
+        })
     }
 }
 
