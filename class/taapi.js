@@ -69,13 +69,17 @@ class TaapiReaderClass {
             for(const alert of alerts) {
                 if(alert.user.telegram_id) {
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                    let value = JSON.stringify(result)
+                    if(alert.indicator=='rsi') {
+                        value = result.value
+                    }
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
         
 ⚠️ Indicator Alert 
     
 🔊 ${alert.indicator}
     
-💰 Current Value: ${JSON.stringify(result)}
+💰 Current Value: ${value}
     
 🕑 ${currentDate} ${currentTime}`
                     exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {

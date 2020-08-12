@@ -45,14 +45,10 @@ async function start(){
     // console.log(alertIndicatorLogic)
     // console.log(await taapiReaderClass.rsi("BTC/USDT"))
 
-    await taapiReaderClass.readAlerts()
+    taapiReaderClass.readAlerts()
 
-    // try{
-    //   console.info('Updating Currency : ')
-    //   console.info( await binanceReaderClass.getFuturesPrices() );
-    // }catch(e){
-    //   console.error('Binance Error', e)
-    // }
+    binanceReaderClass.getFuturesPrices()
+
 
     setTimeout(start, process.env.INTERVAL)
 }
