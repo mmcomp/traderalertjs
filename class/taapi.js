@@ -2,6 +2,7 @@
 
 const AlertIndicator = require('../models/alert_indicators.model')
 const AlertCache = require('../models/alert_caches.model')
+const AlertCacheLog = require('../models/alert_cache_logs.model')
 const BinanceReaderClass = require('./binance')
 const fs = require('fs')
 const { exec } = require("child_process")
@@ -47,6 +48,17 @@ class TaapiReaderClass {
                 }
             }
             console.log('indicator result:', result)
+            alert.result = result
+            const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
+            if(alertCacheLog){
+                try{
+                    alertCacheLog.result = JSON.parse(alertCacheLog.result)
+                }catch(e){
+                    alertCacheLog.result = null
+                }
+            }
+            console.log('alertCacheLog', alertCacheLog)
+            
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
             const alerts = await AlertIndicator.query().withGraphFetched('user')
                 .where('sent', false)
@@ -58,13 +70,14 @@ class TaapiReaderClass {
                 .where('indicator', alert.indicator)
                 .where('timeframe', alert.timeframe)
             console.log('Must send to ', alerts)
-            this.sendAlert(alerts, result)
+            this.sendAlert(alerts, alertCacheLog, alert)
         }catch(e){
             console.log('indicator Error:', e)
         }
     }
 
-    async sendAlert(alerts, result) {
+    async sendAlert(alerts, alertCacheLog, alertCache) {
+        const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
@@ -79,7 +92,7 @@ class TaapiReaderClass {
 
 🕑 ${currentDate} ${currentTime}`
                     this.sendMessage(alert, msg, AlertIndicator)
-                } else if(alert.indicator=='macd' && (result.valueMACD == result.valueMACDSignal || result.valueMACD == result.valueMACDHist)) {
+                } else if(alert.indicator=='macd' && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
@@ -93,6 +106,12 @@ class TaapiReaderClass {
                 }
             }
         }
+        if(alertCacheLog) 
+            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                AlertCacheLog.logAlertCache(alertCache)
+            }).catch()
+        else
+            AlertCacheLog.logAlertCache(alertCache).then().catch()
     }
 
     async sendMessage(alert, msg, alertClass) {
