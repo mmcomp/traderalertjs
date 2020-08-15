@@ -81,7 +81,10 @@ class TaapiReaderClass {
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(alert.indicator=='rsi' && (result.value == process.env.INDICATOR_MAX || result.value == process.env.INDICATOR_MIN)) {
+                if(alert.indicator=='rsi' && (
+                    ((!alertCacheLog) && ((result.value == process.env.INDICATOR_MAX) || (result.value == process.env.INDICATOR_MIN)))) ||
+                    ((alertCacheLog) && ((result.value == process.env.INDICATOR_MAX && alertCacheLog.result.value == process.env.INDICATOR_MIN) || (result.value == process.env.INDICATOR_MIN && alertCacheLog.result.value == process.env.INDICATOR_MAX)))
+                ) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert RSI
@@ -92,7 +95,15 @@ class TaapiReaderClass {
 
 🕑 ${currentDate} ${currentTime}`
                     this.sendMessage(alert, msg, AlertIndicator)
-                } else if(alert.indicator=='macd' && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
+                    if(alertCache.result.value==process.env.INDICATOR_MAX || alertCache.result.value==process.env.INDICATOR_MIN ) {
+                        if(alertCacheLog) 
+                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                AlertCacheLog.logAlertCache(alertCache)
+                            }).catch()
+                        else
+                            AlertCacheLog.logAlertCache(alertCache).then().catch()
+                    }
+                } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
@@ -103,15 +114,16 @@ class TaapiReaderClass {
 
 🕑 ${currentDate} ${currentTime}`
                     this.sendMessage(alert, msg, AlertIndicator)
+                    if(alertCacheLog) 
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
+                    else
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 }
             }
         }
-        if(alertCacheLog) 
-            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                AlertCacheLog.logAlertCache(alertCache)
-            }).catch()
-        else
-            AlertCacheLog.logAlertCache(alertCache).then().catch()
+
     }
 
     async sendMessage(alert, msg, alertClass) {
