@@ -47,7 +47,7 @@ async function start(){
 
     taapiReaderClass.readAlerts()
 
-    // binanceReaderClass.getFuturesPrices()
+    binanceReaderClass.getFuturesPrices()
 
 
     setTimeout(start, process.env.INTERVAL)
