@@ -79,7 +79,7 @@ class TaapiReaderClass {
     async sendAlert(alerts, alertCacheLog, alertCache) {
         console.log('Sending TAPI!')
         const result = alertCache.result
-        if(result)
+        if(result && alertCacheLog && alertCacheLog.result)
             for(const alert of alerts) {
                 if(alert.user.telegram_id) {
                     const {currentDate, currentTime} = BinanceReaderClass.nowDate()
