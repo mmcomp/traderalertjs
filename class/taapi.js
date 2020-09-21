@@ -76,16 +76,43 @@ class TaapiReaderClass {
         }
     }
 
+    rsiVerfy(alert, alertCacheLog, result) {
+        return (
+            alert.indicator=='rsi' && 
+            (
+
+                (!alertCacheLog) && (
+                    (
+                        (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
+                    ) || 
+                    (
+                        (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                    )
+                )
+
+            ) ||
+            (
+                (alertCacheLog) && (
+                    (
+                        (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
+                        (alertCacheLog.result.value < process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
+                    ) ||
+                    (
+                        (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
+                        (alertCacheLog.result.value > process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                    )
+                )
+            )
+        )
+    }
+
     async sendAlert(alerts, alertCacheLog, alertCache) {
         console.log('Sending TAPI!', alertCache, alertCacheLog)
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(alert.indicator=='rsi' && (
-                    ((!alertCacheLog) && ((result.value == process.env.INDICATOR_MAX) || (result.value == process.env.INDICATOR_MIN)))) ||
-                    ((alertCacheLog) && ((result.value == process.env.INDICATOR_MAX && alertCacheLog.result.value == process.env.INDICATOR_MIN) || (result.value == process.env.INDICATOR_MIN && alertCacheLog.result.value == process.env.INDICATOR_MAX)))
-                ) {
+                if(rsiVerfy(alert, alertCacheLog, result)) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert RSI
