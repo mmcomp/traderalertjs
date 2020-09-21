@@ -112,7 +112,7 @@ class TaapiReaderClass {
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(rsiVerfy(alert, alertCacheLog, result)) {
+                if(this.rsiVerfy(alert, alertCacheLog, result)) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert RSI
