@@ -82,7 +82,7 @@ class TaapiReaderClass {
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(alert.indicator=='rsi'  && alertCacheLog && alertCacheLog.result && (
+                if(alert.indicator=='rsi' && (
                     ((!alertCacheLog) && ((result.value == process.env.INDICATOR_MAX) || (result.value == process.env.INDICATOR_MIN)))) ||
                     ((alertCacheLog) && ((result.value == process.env.INDICATOR_MAX && alertCacheLog.result.value == process.env.INDICATOR_MIN) || (result.value == process.env.INDICATOR_MIN && alertCacheLog.result.value == process.env.INDICATOR_MAX)))
                 ) {
