@@ -79,43 +79,24 @@ class TaapiReaderClass {
     async sendAlert(alerts, alertCacheLog, alertCache) {
         console.log('Sending TAPI!', alertCache, alertCacheLog)
         const result = alertCache.result
-        if(result && alertCacheLog && alertCacheLog.result)
-            for(const alert of alerts) {
-                if(alert.user.telegram_id) {
-                    const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                    if(alert.indicator=='rsi' && (
-                        ((!alertCacheLog) && ((result.value == process.env.INDICATOR_MAX) || (result.value == process.env.INDICATOR_MIN)))) ||
-                        ((alertCacheLog) && ((result.value == process.env.INDICATOR_MAX && alertCacheLog.result.value == process.env.INDICATOR_MIN) || (result.value == process.env.INDICATOR_MIN && alertCacheLog.result.value == process.env.INDICATOR_MAX)))
-                    ) {
-                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-        
-    ⚠️ Indicator Alert RSI
+        for(const alert of alerts) {
+            if(alert.user.telegram_id) {
+                const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                if(alert.indicator=='rsi'  && alertCacheLog && alertCacheLog.result && (
+                    ((!alertCacheLog) && ((result.value == process.env.INDICATOR_MAX) || (result.value == process.env.INDICATOR_MIN)))) ||
+                    ((alertCacheLog) && ((result.value == process.env.INDICATOR_MAX && alertCacheLog.result.value == process.env.INDICATOR_MIN) || (result.value == process.env.INDICATOR_MIN && alertCacheLog.result.value == process.env.INDICATOR_MAX)))
+                ) {
+                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Indicator Alert RSI
 
-    🔊 ${alert.indicator} [${alert.timeframe}]
+🔊 ${alert.indicator} [${alert.timeframe}]
 
-    💰 Current Value: ${result.value}
+💰 Current Value: ${result.value}
 
-    🕑 ${currentDate} ${currentTime}`
-                        this.sendMessage(alert, msg, AlertIndicator)
-                        if(alertCache.result.value==process.env.INDICATOR_MAX || alertCache.result.value==process.env.INDICATOR_MIN ) {
-                            if(alertCacheLog) 
-                                AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                                    AlertCacheLog.logAlertCache(alertCache)
-                                }).catch()
-                            else
-                                AlertCacheLog.logAlertCache(alertCache).then().catch()
-                        }
-                    } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
-                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-        
-    ⚠️ Indicator Alert MACD
-
-    🔊 ${alert.indicator} [${alert.timeframe}]
-
-    💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
-
-    🕑 ${currentDate} ${currentTime}`
-                        this.sendMessage(alert, msg, AlertIndicator)
+🕑 ${currentDate} ${currentTime}`
+                    this.sendMessage(alert, msg, AlertIndicator)
+                    if(alertCache.result.value==process.env.INDICATOR_MAX || alertCache.result.value==process.env.INDICATOR_MIN ) {
                         if(alertCacheLog) 
                             AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
@@ -123,8 +104,26 @@ class TaapiReaderClass {
                         else
                             AlertCacheLog.logAlertCache(alertCache).then().catch()
                     }
+                } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
+                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Indicator Alert MACD
+
+🔊 ${alert.indicator} [${alert.timeframe}]
+
+💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
+
+🕑 ${currentDate} ${currentTime}`
+                    this.sendMessage(alert, msg, AlertIndicator)
+                    if(alertCacheLog) 
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
+                    else
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 }
             }
+        }
 
     }
 
