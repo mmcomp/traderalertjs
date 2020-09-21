@@ -77,7 +77,7 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        console.log('Sending TAPI!')
+        console.log('Sending TAPI!', alertCache, alertCacheLog)
         const result = alertCache.result
         if(result && alertCacheLog && alertCacheLog.result)
             for(const alert of alerts) {
