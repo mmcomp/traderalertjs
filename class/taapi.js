@@ -112,13 +112,17 @@ class TaapiReaderClass {
         // )
         var res = false
         if(result.value != alertCacheLog.result.value){
+            console.log('checking rsi conditions')
             if(alertCacheLog) {
+                console.log('has shadow1', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE))
+                console.log('has shadow2', this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE))
                 if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
                     res = true
                 }else if(this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
                     res = true
                 }
             }else {
+                console.log('hasn`t shadow', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE))
                 if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
                     res = true
                 }
