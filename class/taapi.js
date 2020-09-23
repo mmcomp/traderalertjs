@@ -6,6 +6,7 @@ const AlertCacheLog = require('../models/alert_cache_logs.model')
 const BinanceReaderClass = require('./binance')
 const fs = require('fs')
 const { exec } = require("child_process")
+const { val } = require('objection')
 
 class TaapiReaderClass {
     constructor (client){
@@ -77,6 +78,7 @@ class TaapiReaderClass {
     }
 
     compareWithTolerance(value, base, tolerance) {
+        console.log('check ', value, base, tolerance)
         return ((value <= base + tolerance) && (value >= base - tolerance))
     }
 
