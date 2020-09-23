@@ -115,8 +115,9 @@ class TaapiReaderClass {
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(this.rsiVerfy(alert, alertCacheLog, result)) {
-                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+                if(alert.indicator=='rsi') {
+                    if(this.rsiVerfy(alert, alertCacheLog, result)) {
+                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert RSI
 
@@ -125,15 +126,14 @@ class TaapiReaderClass {
 💰 Current Value: ${result.value}
 
 🕑 ${currentDate} ${currentTime}`
-                    this.sendMessage(alert, msg, AlertIndicator)
-                    if(alertCache.result.value==process.env.INDICATOR_MAX || alertCache.result.value==process.env.INDICATOR_MIN ) {
-                        if(alertCacheLog) 
-                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                                AlertCacheLog.logAlertCache(alertCache)
-                            }).catch()
-                        else
-                            AlertCacheLog.logAlertCache(alertCache).then().catch()
+                        this.sendMessage(alert, msg, AlertIndicator)
                     }
+                    if(alertCacheLog) 
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
+                    else
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
