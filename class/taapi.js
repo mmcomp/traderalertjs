@@ -76,39 +76,57 @@ class TaapiReaderClass {
         }
     }
 
+    compareWithTolerance(value, base, tolerance) {
+        return ((value <= base + tolerance) && (value >= base - tolerance))
+    }
+
     rsiVerfy(alert, alertCacheLog, result) {
-        var res = (
-            alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) && 
-            (
-                (
+        // var res = (
+        //     alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) && 
+        //     (
+        //         (
 
-                    (!alertCacheLog) && (
-                        (
-                            (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
-                        ) || 
-                        (
-                            (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
-                        )
-                    )
+        //             (!alertCacheLog) && (
+        //                 (
+        //                     (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
+        //                 ) || 
+        //                 (
+        //                     (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+        //                 )
+        //             )
 
-                ) ||
-                (
-                    (alertCacheLog) && (
-                        (
-                            (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
-                            (alertCacheLog.result.value > process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
-                        ) ||
-                        (
-                            (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
-                            (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
-                        )
-                    )
-                )
-            )
-        )
+        //         ) ||
+        //         (
+        //             (alertCacheLog) && (
+        //                 (
+        //                     (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
+        //                     (alertCacheLog.result.value > process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
+        //                 ) ||
+        //                 (
+        //                     (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
+        //                     (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+        //                 )
+        //             )
+        //         )
+        //     )
+        // )
+        var res = false
+        if(result.value != alertCacheLog.result.value){
+            if(alertCacheLog) {
+                if(compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
+                    res = true
+                }else if(compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
+                    res = true
+                }
+            }else {
+                if(compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
+                    res = true
+                }
+            }
+        }
         console.log('Check rsi verfify', res)
-        console.log(alert, alertCacheLog, result)
-        console.log((result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE), (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE))
+        // console.log(alert, alertCacheLog, result)
+        // console.log((result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE), (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE))
         return res
     }
 
