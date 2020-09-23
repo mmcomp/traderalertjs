@@ -96,11 +96,11 @@ class TaapiReaderClass {
                     (alertCacheLog) && (
                         (
                             (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
-                            (alertCacheLog.result.value < process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
+                            (alertCacheLog.result.value > process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
                         ) ||
                         (
                             (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
-                            (alertCacheLog.result.value > process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                            (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
                         )
                     )
                 )
