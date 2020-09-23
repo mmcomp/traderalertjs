@@ -78,28 +78,30 @@ class TaapiReaderClass {
 
     rsiVerfy(alert, alertCacheLog, result) {
         var res = (
-            alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) &&
+            alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) && 
             (
+                (
 
-                (!alertCacheLog) && (
-                    (
-                        (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
-                    ) || 
-                    (
-                        (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                    (!alertCacheLog) && (
+                        (
+                            (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
+                        ) || 
+                        (
+                            (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                        )
                     )
-                )
 
-            ) ||
-            (
-                (alertCacheLog) && (
-                    (
-                        (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
-                        (alertCacheLog.result.value < process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
-                    ) ||
-                    (
-                        (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
-                        (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                ) ||
+                (
+                    (alertCacheLog) && (
+                        (
+                            (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
+                            (alertCacheLog.result.value < process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
+                        ) ||
+                        (
+                            (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
+                            (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
+                        )
                     )
                 )
             )
