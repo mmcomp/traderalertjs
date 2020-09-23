@@ -105,6 +105,7 @@ class TaapiReaderClass {
             )
         )
         console.log('Check rsi verfify', res)
+        console.log(alert, alertCacheLog, result)
         return res
     }
 
