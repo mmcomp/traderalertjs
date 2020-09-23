@@ -78,7 +78,7 @@ class TaapiReaderClass {
 
     rsiVerfy(alert, alertCacheLog, result) {
         var res = (
-            alert.indicator=='rsi' && 
+            alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) &&
             (
 
                 (!alertCacheLog) && (
