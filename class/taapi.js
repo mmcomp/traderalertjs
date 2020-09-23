@@ -77,7 +77,7 @@ class TaapiReaderClass {
     }
 
     rsiVerfy(alert, alertCacheLog, result) {
-        return (
+        var res = (
             alert.indicator=='rsi' && 
             (
 
@@ -104,6 +104,8 @@ class TaapiReaderClass {
                 )
             )
         )
+        console.log('Check rsi verfify', res)
+        return res
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
