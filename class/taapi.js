@@ -113,13 +113,13 @@ class TaapiReaderClass {
         var res = false
         if(result.value != alertCacheLog.result.value){
             if(alertCacheLog) {
-                if(compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
+                if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
                     res = true
-                }else if(compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
+                }else if(this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
                     res = true
                 }
             }else {
-                if(compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
+                if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
                     res = true
                 }
             }
