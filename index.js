@@ -40,17 +40,11 @@ const BinanceReaderClass = require('./class/binance')
 const binanceReaderClass = new BinanceReaderClass(binance)
 
 async function start(){
-    // const alertIndicatorLogic = new AlertIndicatorLogic()
-    // await alertIndicatorLogic.init()
-    // console.log(alertIndicatorLogic)
-    // console.log(await taapiReaderClass.rsi("BTC/USDT"))
-
     taapiReaderClass.readAlerts()
 
     binanceReaderClass.getFuturesPrices()
 
-
-    setTimeout(start, process.env.INTERVAL)
+    setTimeout(start, process.env.BINANCE_INTERVAL)
 }
 
 start()
