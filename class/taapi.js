@@ -106,6 +106,7 @@ class TaapiReaderClass {
         )
         console.log('Check rsi verfify', res)
         console.log(alert, alertCacheLog, result)
+        console.log((result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE), (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE))
         return res
     }
 
