@@ -83,55 +83,36 @@ class TaapiReaderClass {
     }
 
     rsiVerfy(alert, alertCacheLog, result) {
-        // var res = (
-        //     alert.indicator=='rsi' &&  (result.value != alertCacheLog.result.value) && 
-        //     (
-        //         (
+        const INDICATOR_MAX = process.env.INDICATOR_MAX
+        const INDICATOR_MIN = process.env.INDICATOR_MIN
+        const INDICATOR_TOLERANCE = process.env.INDICATOR_TOLERANCE
 
-        //             (!alertCacheLog) && (
-        //                 (
-        //                     (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)
-        //                 ) || 
-        //                 (
-        //                     (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
-        //                 )
-        //             )
-
-        //         ) ||
-        //         (
-        //             (alertCacheLog) && (
-        //                 (
-        //                     (result.value >= process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE) &&
-        //                     (alertCacheLog.result.value > process.env.INDICATOR_MAX - process.env.INDICATOR_TOLERANCE)
-        //                 ) ||
-        //                 (
-        //                     (result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE) && (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE) &&
-        //                     (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE)
-        //                 )
-        //             )
-        //         )
-        //     )
-        // )
         var res = false
-        if(result.value != alertCacheLog.result.value){
-            console.log('checking rsi conditions')
-            if(alertCacheLog) {
-                console.log('has shadow1', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE))
-                console.log('has shadow2', this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE))
-                if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
-                    res = true
-                }else if(this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
-                    res = true
-                }
-            }else {
-                console.log('hasn`t shadow', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE))
-                if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
-                    res = true
-                }
-            }
-        }
-        console.log('Check rsi verfify', res)
-        console.log(alert, alertCacheLog, result)
+        if((alertCacheLog.result.value<INDICATOR_MAX-INDICATOR_TOLERANCE) && (result.value==INDICATOR_MAX))
+            res = true
+        else if((alertCacheLog.result.value>INDICATOR_MIN+INDICATOR_TOLERANCE) && (result.value==INDICATOR_MIN))
+            res = true
+        return res
+        // var res = false
+        // if(result.value != alertCacheLog.result.value){
+        //     console.log('checking rsi conditions')
+        //     if(alertCacheLog) {
+        //         console.log('has shadow1', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE))
+        //         console.log('has shadow2', this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE))
+        //         if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
+        //             res = true
+        //         }else if(this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
+        //             res = true
+        //         }
+        //     }else {
+        //         console.log('hasn`t shadow', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE))
+        //         if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
+        //             res = true
+        //         }
+        //     }
+        // }
+        // console.log('Check rsi verfify', res)
+        // console.log(alert, alertCacheLog, result)
         // console.log((result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE), (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE))
         return res
     }
@@ -143,9 +124,11 @@ class TaapiReaderClass {
             if(alert.user.telegram_id) {
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
-                    if(this.rsiVerfy(alert, alertCacheLog, result)) {
-                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-    
+                    if(alertCacheLog) 
+                    {
+                        if(this.rsiVerfy(alert, alertCacheLog, result)) {
+                            let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+        
 ⚠️ Indicator Alert RSI
 
 🔊 ${alert.indicator} [${alert.timeframe}]
@@ -153,12 +136,12 @@ class TaapiReaderClass {
 💰 Current Value: ${result.value}
 
 🕑 ${currentDate} ${currentTime}`
-                        this.sendMessage(alert, msg, AlertIndicator)
-                    }
-                    if(alertCacheLog) 
+                            this.sendMessage(alert, msg, AlertIndicator)
+                        }
                         AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
+                    }
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
