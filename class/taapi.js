@@ -88,9 +88,9 @@ class TaapiReaderClass {
         const INDICATOR_TOLERANCE = process.env.INDICATOR_TOLERANCE
 
         var res = false
-        if((alertCacheLog.result.value<INDICATOR_MAX-INDICATOR_TOLERANCE) && (result.value==INDICATOR_MAX))
+        if((alertCacheLog.result.value<INDICATOR_MAX-INDICATOR_TOLERANCE) && (result.value>=INDICATOR_MAX))
             res = true
-        else if((alertCacheLog.result.value>INDICATOR_MIN+INDICATOR_TOLERANCE) && (result.value==INDICATOR_MIN))
+        else if((alertCacheLog.result.value>INDICATOR_MIN+INDICATOR_TOLERANCE) && (result.value<=INDICATOR_MIN))
             res = true
         return res
         // var res = false
