@@ -27,10 +27,12 @@ class TaapiReaderClass {
 
     async readAlerts() {
         const alerts = await AlertCache.query().where('type', 'indicator')
+        var indx = 1
         for(var alert of alerts) {
-            console.log(' - Start reading an alert from Tapi ....')
+            console.log(` - Start reading an alert from Tapi ${indx} ....`)
             await this.readAlert(alert)
             await new Promise(r => setTimeout(r, process.env.TAAPI_REQUEST_INTERVAL));
+            indx++
         }
     }
     
