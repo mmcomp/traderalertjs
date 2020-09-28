@@ -39,12 +39,21 @@ const binance = new Binance().options({
 const BinanceReaderClass = require('./class/binance')
 const binanceReaderClass = new BinanceReaderClass(binance)
 
+async function binanceRoutine() {
+  await binanceReaderClass.getFuturesPrices()
+
+  setTimeout(binanceRoutine, process.env.BINANCE_INTERVAL)
+}
+
+async function taapiRoutine() {
+  await taapiReaderClass.readAlerts()
+
+  setTimeout(taapiRoutine, process.env.TAAPI_INTERVAL)
+}
+
 async function start(){
-    taapiReaderClass.readAlerts()
-
-    binanceReaderClass.getFuturesPrices()
-
-    setTimeout(start, process.env.BINANCE_INTERVAL)
+  taapiRoutine()
+  binanceRoutine()
 }
 
 start()

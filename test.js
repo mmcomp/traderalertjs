@@ -14,4 +14,4 @@ class test{
 }
 
 const testVar = new test()
-console.log(testVar.rsiVerfy(null, {result:{value:26}}, {value:19}))
+console.log(testVar.rsiVerfy(null, {result:{value:50}}, {value:83}))
