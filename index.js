@@ -40,18 +40,21 @@ const BinanceReaderClass = require('./class/binance')
 const binanceReaderClass = new BinanceReaderClass(binance)
 
 async function binanceRoutine() {
+  console.log('Start Binance proccess ....')
   await binanceReaderClass.getFuturesPrices()
 
   setTimeout(binanceRoutine, process.env.BINANCE_INTERVAL)
 }
 
 async function taapiRoutine() {
+  console.log('Start Tapi proccess ....')
   await taapiReaderClass.readAlerts()
 
   setTimeout(taapiRoutine, process.env.TAAPI_INTERVAL)
 }
 
 async function start(){
+  console.log('Trader Alert Starting ....')
   taapiRoutine()
   binanceRoutine()
 }

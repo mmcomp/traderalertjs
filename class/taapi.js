@@ -18,7 +18,6 @@ class TaapiReaderClass {
         return new Promise(async function(resolve, reject){
             try{
                 let result = await client.getIndicator(indicator, source, symbol, interval, params, backtrack)
-                // console.log("Result: ", result)
                 resolve(result)
             }catch(e){
                 reject(e)
@@ -28,15 +27,14 @@ class TaapiReaderClass {
 
     async readAlerts() {
         const alerts = await AlertCache.query().where('type', 'indicator')
-        console.log('Indicator Alerts', alerts)
         for(var alert of alerts) {
+            console.log(' - Start reading an alert from Tapi ....')
             await this.readAlert(alert)
             await new Promise(r => setTimeout(r, process.env.TAAPI_REQUEST_INTERVAL));
         }
     }
     
     async readAlert(alert) {
-        console.log('Read Alert', alert)
         try{
             var result = {}
             const cachePath = process.env.CACHE_PATH + 'Tapi_getIndicator.json'
@@ -49,7 +47,6 @@ class TaapiReaderClass {
                     fs.writeFileSync(cachePath,  dataToStore)
                 }
             }
-            console.log('indicator result:', result)
             alert.result = result
             const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
             if(alertCacheLog){
@@ -59,7 +56,6 @@ class TaapiReaderClass {
                     alertCacheLog.result = null
                 }
             }
-            console.log('alertCacheLog', alertCacheLog)
             
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
             const alerts = await AlertIndicator.query().withGraphFetched('user')
@@ -71,7 +67,6 @@ class TaapiReaderClass {
                 .where('exchange', alert.exchange)
                 .where('indicator', alert.indicator)
                 .where('timeframe', alert.timeframe)
-            console.log('Must send to ', alerts)
             this.sendAlert(alerts, alertCacheLog, alert)
         }catch(e){
             console.log('indicator Error:', e)
@@ -79,7 +74,6 @@ class TaapiReaderClass {
     }
 
     compareWithTolerance(value, base, tolerance) {
-        console.log('check ', value, base, tolerance)
         return ((value <= base + tolerance) && (value >= base - tolerance))
     }
 
@@ -94,32 +88,9 @@ class TaapiReaderClass {
         else if((alertCacheLog.result.value>INDICATOR_MIN+INDICATOR_TOLERANCE) && (result.value<=INDICATOR_MIN))
             res = true
         return res
-        // var res = false
-        // if(result.value != alertCacheLog.result.value){
-        //     console.log('checking rsi conditions')
-        //     if(alertCacheLog) {
-        //         console.log('has shadow1', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE))
-        //         console.log('has shadow2', this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE))
-        //         if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value > process.env.INDICATOR_MAX + process.env.INDICATOR_TOLERANCE)){
-        //             res = true
-        //         }else if(this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE) && (alertCacheLog.result.value < process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE)){
-        //             res = true
-        //         }
-        //     }else {
-        //         console.log('hasn`t shadow', this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE), this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE))
-        //         if(this.compareWithTolerance(result.value, process.env.INDICATOR_MAX, process.env.INDICATOR_TOLERANCE) || this.compareWithTolerance(result.value, process.env.INDICATOR_MIN, process.env.INDICATOR_TOLERANCE)){
-        //             res = true
-        //         }
-        //     }
-        // }
-        // console.log('Check rsi verfify', res)
-        // console.log(alert, alertCacheLog, result)
-        // console.log((result.value >= process.env.INDICATOR_MIN - process.env.INDICATOR_TOLERANCE), (result.value <= process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE), (alertCacheLog.result.value < process.env.INDICATOR_MIN + process.env.INDICATOR_TOLERANCE))
-        return res
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        console.log('Sending TAPI!', alertCache, alertCacheLog)
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
@@ -169,7 +140,6 @@ class TaapiReaderClass {
     }
 
     async sendMessage(alert, msg, alertClass) {
-        console.log('Telegram Send!')
         return new Promise(function(resolve, reject){
             exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
                 if (error) {
