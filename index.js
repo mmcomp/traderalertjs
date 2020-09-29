@@ -43,14 +43,14 @@ async function binanceRoutine() {
   console.log('Start Binance proccess ....')
   await binanceReaderClass.getFuturesPrices()
 
-  setTimeout(binanceRoutine, process.env.BINANCE_INTERVAL)
+  setTimeout(binanceRoutine, parseInt(process.env.BINANCE_INTERVAL, 10))
 }
 
 async function taapiRoutine() {
   console.log('Start Tapi proccess ....')
   await taapiReaderClass.readAlerts()
 
-  setTimeout(taapiRoutine, process.env.TAAPI_INTERVAL)
+  setTimeout(taapiRoutine, parseInt(process.env.TAAPI_INTERVAL, 10))
 }
 
 async function start(){
