@@ -86,7 +86,7 @@ class TaapiReaderClass {
         const pastValue = alertCacheLog.result.value
         const currentValue = result.value
         console.log('RSI : checking from ', pastValue, 'to', currentValue)
-        console.log((pastValue>(INDICATOR_MIN+INDICATOR_TOLERANCE)), (currentValue<=INDICATOR_MIN))
+        console.log(pastValue, INDICATOR_MIN+INDICATOR_TOLERANCE)
         var res = false
         if((pastValue<(INDICATOR_MAX-INDICATOR_TOLERANCE)) && (currentValue>=INDICATOR_MAX))
             res = true
