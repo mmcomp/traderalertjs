@@ -14,4 +14,6 @@ class test{
 }
 
 const testVar = new test()
-console.log(testVar.rsiVerfy(null, {result:{value:50}}, {value:83}))
+var pastValue = 74
+var currentValue = 80
+console.log(pastValue, currentValue, testVar.rsiVerfy(null, {result:{value:pastValue}}, {value:currentValue}))
