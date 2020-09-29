@@ -80,9 +80,9 @@ class TaapiReaderClass {
     }
 
     rsiVerfy(alert, alertCacheLog, result) {
-        const INDICATOR_MAX = process.env.INDICATOR_MAX
-        const INDICATOR_MIN = process.env.INDICATOR_MIN
-        const INDICATOR_TOLERANCE = process.env.INDICATOR_TOLERANCE
+        const INDICATOR_MAX = parseInt(process.env.INDICATOR_MAX, 10)
+        const INDICATOR_MIN = parseInt(process.env.INDICATOR_MIN, 10)
+        const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
         const pastValue = alertCacheLog.result.value
         const currentValue = result.value
         console.log('RSI : checking from ', pastValue, 'to', currentValue)
