@@ -144,6 +144,7 @@ class TaapiReaderClass {
     }
 
     async sendMessage(alert, msg, alertClass) {
+        console.log('Sending Telegram MSG to ', alert.user.telegram_id)
         return new Promise(function(resolve, reject){
             exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
                 if (error) {
