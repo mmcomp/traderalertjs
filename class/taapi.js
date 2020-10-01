@@ -120,8 +120,7 @@ class TaapiReaderClass {
                         const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
                         const pastValue = alertCacheLog.result.value
                         const currentValue = result.value
-                        console.log(currentValue, (INDICATOR_MIN - INDICATOR_TOLERANCE), (INDICATOR_MAX+INDICATOR_TOLERANCE))
-                        if(currentValue<(INDICATOR_MIN - INDICATOR_TOLERANCE) || currentValue>(INDICATOR_MAX+INDICATOR_TOLERANCE))
+                        if(currentValue<(INDICATOR_MIN - INDICATOR_TOLERANCE) || currentValue>(INDICATOR_MAX+INDICATOR_TOLERANCE) || (currentValue>(INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue<(INDICATOR_MAX - INDICATOR_TOLERANCE)))
                             AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
                             }).catch()
