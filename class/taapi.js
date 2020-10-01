@@ -86,7 +86,6 @@ class TaapiReaderClass {
         const pastValue = alertCacheLog.result.value
         const currentValue = result.value
         console.log('RSI : checking from ', pastValue, 'to', currentValue)
-        console.log(pastValue, INDICATOR_MIN+INDICATOR_TOLERANCE)
         var res = false
         if((pastValue<(INDICATOR_MAX-INDICATOR_TOLERANCE)) && (currentValue>=INDICATOR_MAX))
             res = true
@@ -116,9 +115,15 @@ class TaapiReaderClass {
 🕑 ${currentDate} ${currentTime}`
                             this.sendMessage(alert, msg, AlertIndicator)
                         }
-                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                            AlertCacheLog.logAlertCache(alertCache)
-                        }).catch()
+                        const INDICATOR_MAX = parseInt(process.env.INDICATOR_MAX, 10)
+                        const INDICATOR_MIN = parseInt(process.env.INDICATOR_MIN, 10)
+                        const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
+                        const pastValue = alertCacheLog.result.value
+                        const currentValue = result.value
+                        if(currentValue<(INDICATOR_MIN - INDICATOR_TOLERANCE) || currentValue>(INDICATOR_MAX+INDICATOR_TOLERANCE))
+                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                AlertCacheLog.logAlertCache(alertCache)
+                            }).catch()
                     }
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
