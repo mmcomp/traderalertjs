@@ -57,6 +57,9 @@ class TaapiReaderClass {
                 }catch(e){
                     alertCacheLog.result = null
                 }
+                const timeDiff = new Date() - new Date(alertCacheLog.created_at) / 60000
+                if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
+                    return false
             }
             
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
@@ -131,7 +134,8 @@ class TaapiReaderClass {
                     }
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
-                } else if(alert.indicator=='macd' && alertCacheLog && ((result.valueMACDHist>0 && alertCacheLog.result.valueMACDHist<0) || (result.valueMACDHist<0 && alertCacheLog.result.valueMACDHist>0))) {
+                } else if(alert.indicator=='macd') {
+
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
@@ -141,13 +145,15 @@ class TaapiReaderClass {
 💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
 
 🕑 ${currentDate} ${currentTime}`
-                    this.sendMessage(alert, msg, AlertIndicator)
-                    if(alertCacheLog) 
-                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                            AlertCacheLog.logAlertCache(alertCache)
-                        }).catch()
-                    else
-                        AlertCacheLog.logAlertCache(alertCache).then().catch()
+                    if(alertCacheLog && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
+                        const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
+                        const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
+                        if(currentPol!=pastPol)
+                            this.sendMessage(alert, msg, AlertIndicator)
+                    }else
+                        this.sendMessage(alert, msg, AlertIndicator)
+
+                    AlertCacheLog.logAlertCache(alertCache).then().catch()
                 }
             }
         }
