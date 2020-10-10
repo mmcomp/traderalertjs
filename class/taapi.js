@@ -146,7 +146,7 @@ class TaapiReaderClass {
 💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
 
 🕑 ${currentDate} ${currentTime}`
-                    if(alertCacheLog && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
+                    if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
                         const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
                         const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
                         if(currentPol!=pastPol)
