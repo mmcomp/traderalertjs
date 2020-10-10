@@ -58,11 +58,11 @@ class TaapiReaderClass {
                     alertCacheLog.result = null
                 }
                 const timeDiff = (new Date() - new Date(alertCacheLog.created_at)) / 60000
-                console.log(alertCacheLog.id, new Date(), alertCacheLog.created_at, new Date(alertCacheLog.created_at))
-                console.log('TimeDef', timeDiff)
-                return false
-                // if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
-                    // return false
+                // console.log(alertCacheLog.id, new Date(), alertCacheLog.created_at, new Date(alertCacheLog.created_at))
+                // console.log('TimeDef', timeDiff)
+                // return false
+                if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
+                    return false
             }
             
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
