@@ -21,7 +21,7 @@ const knex = Knex({
   useNullAsDefault: true,
   connection: dbConnection,
   pool: { min: 5, max: 30 },
-  timezone: 'Asia/Tehran'
+  timezone: 'UTC'
 });
 Model.knex(knex);
 
