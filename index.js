@@ -20,7 +20,8 @@ const knex = Knex({
   client: (process.env.CLIENT)?process.env.CLIENT:'mysql',
   useNullAsDefault: true,
   connection: dbConnection,
-  pool: { min: 5, max: 30 }
+  pool: { min: 5, max: 30 },
+  timezone: 'Asia/Tehran'
 });
 Model.knex(knex);
 
