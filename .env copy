@@ -1,0 +1,24 @@
+TZ='Asia/Tehran'
+IS_TEST=false
+CACHE_PATH="C:\\Users\\mirsamie\\Documents\\traderalertjs\\cache\\"
+ALERT_LIFETIME_MINUTES=5
+
+# TELEGRAM
+BASE_COMMAND='cd ..\traderalert && php artisan telegram:send'
+
+# TAAPI
+KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNTkxODEyODczLCJleHAiOjc4OTkwMTI4NzN9.iDJhyuqT2_KR_pTzIgmpt5j4VquaApt_G7QpDZWEkrM
+INDICATOR_MAX=80
+INDICATOR_MIN=20
+INDICATOR_TOLERANCE=5
+TAAPI_INTERVAL=10000
+TAAPI_REQUEST_INTERVAL=1000
+
+# BINANCE
+API_KEY=ZWTtDTaeoqfbhEnXrkn2S4oixDl6KwBXSWgJioCy8hlbFda1K7fNHqt0SHZ0PJ3z
+API_SECRET=O4Hwxfn3ByDfU1xUfXsp7daMc1MCHfkige2eRdfResTiD9dbs7LajKGRCtlAMLig
+BINANCE_INTERVAL=10000
+
+# DATABASE
+CONNECTION={"host": "localhost","user": "root","password": "","database": "traderalert"}
+CLIENT=mysql
