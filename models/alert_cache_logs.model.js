@@ -20,6 +20,7 @@ class AlertCacheLog extends Model {
     alertCache.alert_caches_id = alertCache.id
     alertCache.result = (alertCache.result)?JSON.stringify(alertCache.result):alertCache.result
     delete alertCache.id
+    console.log('Insert to Cache', alertCache)
     return await AlertCacheLog.query().insert(alertCache)
   }
 }
