@@ -154,12 +154,10 @@ class TaapiReaderClass {
                             this.sendMessage(alert, msg, AlertIndicator)
                     }else
                         this.sendMessage(alert, msg, AlertIndicator)
-                    console.log('Updating log macd')
-                    AlertCacheLog.logAlertCache(alertCache).then(res => {
-                        console.log('Update res', res)
-                    }).catch(err => {
-                        console.log('Update error', err)
-                    })
+
+                    AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                        AlertCacheLog.logAlertCache(alertCache)
+                    }).catch()
                 }
             }
         }
