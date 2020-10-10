@@ -16,6 +16,13 @@ class AlertCacheLog extends Model {
     this.updated_at = new Date().toISOString()
   }
 
+  $parseDatabaseJson(json) {
+    json = super.$parseDatabaseJson(json);
+    json.created_at = json.created_at && new Date(json.created_at);
+    json.updated_at = json.updated_at && new Date(json.updated_at);
+    return json;
+  }
+
   static async logAlertCache(alertCache){
     alertCache.alert_caches_id = alertCache.id
     alertCache.result = (alertCache.result)?JSON.stringify(alertCache.result):alertCache.result
