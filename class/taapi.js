@@ -58,6 +58,7 @@ class TaapiReaderClass {
                     alertCacheLog.result = null
                 }
                 const timeDiff = new Date() - new Date(alertCacheLog.created_at) / 60000
+                console.log('TimeDef', timeDiff)
                 if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
                     return false
             }
