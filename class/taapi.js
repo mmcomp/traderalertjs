@@ -14,7 +14,7 @@ class TaapiReaderClass {
     }
 
     async getIndicator(indicator, source, symbol, interval, params, backtrack) {
-        source = source.replace(' || ', '')
+        source = (source.indexOf("binance")>=0)?"binance":source
         console.log(`getIndicator(${indicator}, ${source}, ${symbol}, ${interval})`)
         let client = this.client
         return new Promise(async function(resolve, reject){
