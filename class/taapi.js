@@ -51,6 +51,7 @@ class TaapiReaderClass {
                     fs.writeFileSync(cachePath,  dataToStore)
                 }
             }
+            console.log('Result', result)
             alert.result = result
             const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
             if(alertCacheLog){
