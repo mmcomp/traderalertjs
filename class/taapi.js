@@ -78,6 +78,7 @@ class TaapiReaderClass {
                 .where('exchange', alert.exchange)
                 .where('indicator', alert.indicator)
                 .where('timeframe', alert.timeframe)
+            console.log('Sending Alert')
             this.sendAlert(alerts, alertCacheLog, alert)
         }catch(e){
             console.log('indicator Error:', e)
