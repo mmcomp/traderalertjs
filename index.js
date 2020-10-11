@@ -31,6 +31,12 @@ const TaapiReaderClass = require('./class/taapi')
 const client = taapi.client(process.env.KEY)
 const taapiReaderClass = new TaapiReaderClass(client)
 
+taapiReaderClass.getIndicator("bband", "‌‌binance", "BTC/USDT", "15M").then(result => {
+  console.log(result)
+}).catch(err => {
+  console.log(err)
+})
+/*
 const Binance = require('node-binance-api')
 const binance = new Binance().options({
   APIKEY: process.env.API_KEY,
@@ -60,3 +66,4 @@ async function start(){
 }
 
 start()
+*/

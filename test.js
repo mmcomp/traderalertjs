@@ -1,19 +1,9 @@
-class test{
-    rsiVerfy(alert, alertCacheLog, result) {
-        const INDICATOR_MAX =80
-        const INDICATOR_MIN = 20
-        const INDICATOR_TOLERANCE = 5
+const TaapiReaderClass = require('./class/taapi')
+const taapi = require("taapi")
+const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNTkxODEyODczLCJleHAiOjc4OTkwMTI4NzN9.iDJhyuqT2_KR_pTzIgmpt5j4VquaApt_G7QpDZWEkrM")
 
-        var res = false
-        if((alertCacheLog.result.value<INDICATOR_MAX-INDICATOR_TOLERANCE) && (result.value>=INDICATOR_MAX))
-            res = true
-        else if((alertCacheLog.result.value>INDICATOR_MIN+INDICATOR_TOLERANCE) && (result.value<=INDICATOR_MIN))
-            res = true
-        return res
-    }
-}
-
-const testVar = new test()
-var pastValue = 26
-var currentValue = 20
-console.log(pastValue, currentValue, testVar.rsiVerfy(null, {result:{value:pastValue}}, {value:currentValue}))
+client.getIndicator("bband", "‌‌binance", "BTC/USDT", "15M").then(result => {
+    console.log(result)
+}).catch(err => {
+    console.log(err)
+})
