@@ -169,7 +169,9 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache)
                     }).catch()
                 } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
+                    console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
+                    console.log('Current Value', currencyObject)
                     if(currencyObject && alertCacheLog) {
                         const price = currencyObject.price
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
@@ -189,7 +191,9 @@ class TaapiReaderClass {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
                     }else
-                        AlertCacheLog.logAlertCache(alertCache).then().catch()
+                        AlertCacheLog.logAlertCache(alertCache).then(res=>{
+                            console.log('add res', res)
+                        }).catch()
                 }
             }
         }
