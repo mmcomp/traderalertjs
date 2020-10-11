@@ -14,11 +14,12 @@ class TaapiReaderClass {
     }
 
     async getIndicator(indicator, source, symbol, interval, params, backtrack) {
+        source = source.replace(' || ', '')
         console.log(`getIndicator(${indicator}, ${source}, ${symbol}, ${interval})`)
         let client = this.client
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, "binance", "BTC/USDT", "4h")//client.getIndicator("bbands2", "binance", "BTC/USDT", "4h")//client.getIndicator(indicator, source, symbol, interval, params, backtrack)
+                let result = await client.getIndicator(indicator, source, symbol, interval)//client.getIndicator("bbands2", "binance", "BTC/USDT", "4h")//client.getIndicator(indicator, source, symbol, interval, params, backtrack)
                 resolve(result)
             }catch(e){
                 reject(e)
