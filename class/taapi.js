@@ -114,6 +114,7 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
+        console.log('Really sending!', alerts, alertCacheLog, alertCache)
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
