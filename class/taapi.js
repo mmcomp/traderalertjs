@@ -17,7 +17,7 @@ class TaapiReaderClass {
         let client = this.client
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, source, symbol, interval)//client.getIndicator("bbands2", "binance", "BTC/USDT", "4h")//client.getIndicator(indicator, source, symbol, interval, params, backtrack)
+                let result = await client.getIndicator("bbands2", source, symbol, interval)//client.getIndicator("bbands2", "binance", "BTC/USDT", "4h")//client.getIndicator(indicator, source, symbol, interval, params, backtrack)
                 resolve(result)
             }catch(e){
                 reject(e)
