@@ -3,6 +3,7 @@
 const AlertIndicator = require('../models/alert_indicators.model')
 const AlertCache = require('../models/alert_caches.model')
 const AlertCacheLog = require('../models/alert_cache_logs.model')
+const Currency = require('../models/currencies.model')
 const BinanceReaderClass = require('./binance')
 const fs = require('fs')
 const { exec } = require("child_process")
@@ -102,6 +103,14 @@ class TaapiReaderClass {
         return res
     }
 
+    bbandsVerfy(price, oldPrice, result) {
+        if(oldPrice < result.valueUpperBand && price >=result.valueUpperBand)
+            return true
+        if(oldPrice > result.valueLowerBand && price <=result.valueLowerBand)
+            return true
+        return false
+    }
+
     async sendAlert(alerts, alertCacheLog, alertCache) {
         const result = alertCache.result
         for(const alert of alerts) {
@@ -159,6 +168,28 @@ class TaapiReaderClass {
                     AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                         AlertCacheLog.logAlertCache(alertCache)
                     }).catch()
+                } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
+                    const currencyObject = await Currency.query().where('name', alert.currency).first()
+                    if(currencyObject && alertCacheLog) {
+                        const price = currencyObject.price
+                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Indicator Alert Boilinger Band
+
+🔊 ${alert.indicator} [${alert.timeframe}]
+
+💰 Current Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
+
+🕑 ${currentDate} ${currentTime}`
+
+                        if(this.bbandsVerfy(price, alertCacheLog.result, result))
+                            this.sendMessage(alert, msg, AlertIndicator)
+
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
+                    }else
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 }
             }
         }
