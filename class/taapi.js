@@ -115,6 +115,7 @@ class TaapiReaderClass {
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
+                console.log('Alert of ', alert.indicator)
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
                     if(alertCacheLog) 
