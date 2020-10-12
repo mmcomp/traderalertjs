@@ -176,8 +176,11 @@ class TaapiReaderClass {
                     console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
                     console.log('Current Value', currencyObject)
-                    if(currencyObject && alertCacheLog) {
-                        const price = currencyObject.price
+                    let price = null
+                    if(currencyObject)
+                        price = currencyObject.price
+                    alertCache.result = price
+                    if(alertCacheLog) {
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert Boilinger Band
