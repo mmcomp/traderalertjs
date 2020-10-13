@@ -113,6 +113,14 @@ class TaapiReaderClass {
         return false
     }
 
+    fiboVerfy(price, oldPrice, result) {
+        if(oldPrice < result.value && price >=result.value)
+            return true
+        if(oldPrice > result.value && price <=result.value)
+            return true
+        return false
+    }
+
     async sendAlert(alerts, alertCacheLog, alertCache) {
         console.log('Really sending!', alerts, alertCacheLog, alertCache)
         const result = alertCache.result
@@ -198,9 +206,7 @@ class TaapiReaderClass {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
                     }else
-                        AlertCacheLog.logAlertCache(alertCache).then(res=>{
-                            console.log('add res', res)
-                        }).catch()
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='fibonacciretracement') {
                     console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
@@ -216,20 +222,18 @@ class TaapiReaderClass {
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
-💰 Current Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
+💰 Current Value:  Value: ${result.value}
 
 🕑 ${currentDate} ${currentTime}`
 
-                        if(this.bbandsVerfy(price, alertCacheLog.result, result))
+                        if(this.fiboVerfy(price, alertCacheLog.result, result))
                             this.sendMessage(alert, msg, AlertIndicator)
 
                         AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
                     }else
-                        AlertCacheLog.logAlertCache(alertCache).then(res=>{
-                            console.log('add res', res)
-                        }).catch()
+                        AlertCacheLog.logAlertCache(alertCache).then().catch()
                 }
             }
         }
