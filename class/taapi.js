@@ -201,6 +201,35 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache).then(res=>{
                             console.log('add res', res)
                         }).catch()
+                } else if(alert.indicator=='fibonacciretracement') {
+                    console.log('BBand found')
+                    const currencyObject = await Currency.query().where('name', alert.currency).first()
+                    console.log('Current Value', currencyObject)
+                    let price = null
+                    if(currencyObject)
+                        price = currencyObject.price
+                    alertCache.result = price
+                    if(alertCacheLog) {
+                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    
+⚠️ Indicator Alert Fibonacciretracement
+
+🔊 ${alert.indicator} [${alert.timeframe}]
+
+💰 Current Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
+
+🕑 ${currentDate} ${currentTime}`
+
+                        if(this.bbandsVerfy(price, alertCacheLog.result, result))
+                            this.sendMessage(alert, msg, AlertIndicator)
+
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
+                    }else
+                        AlertCacheLog.logAlertCache(alertCache).then(res=>{
+                            console.log('add res', res)
+                        }).catch()
                 }
             }
         }
