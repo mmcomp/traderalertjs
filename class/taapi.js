@@ -114,6 +114,7 @@ class TaapiReaderClass {
     }
 
     fiboVerfy(price, oldPrice, result) {
+        console.log('Fibo test', price, oldPrice, result)
         if(oldPrice < result.value && price >=result.value)
             return true
         if(oldPrice > result.value && price <=result.value)
@@ -208,7 +209,7 @@ class TaapiReaderClass {
                     }else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='fibonacciretracement') {
-                    console.log('BBand found')
+                    console.log('Fibo found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
                     console.log('Current Value', currencyObject)
                     let price = null
