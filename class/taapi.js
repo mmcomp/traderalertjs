@@ -175,8 +175,8 @@ class TaapiReaderClass {
                         const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
                         if(currentPol!=pastPol)
                             this.sendMessage(alert, msg, AlertIndicator)
-                    }else
-                        this.sendMessage(alert, msg, AlertIndicator)
+                    }/*else
+                        this.sendMessage(alert, msg, AlertIndicator)*/
 
                     AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                         AlertCacheLog.logAlertCache(alertCache)
