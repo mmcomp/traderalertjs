@@ -36,6 +36,7 @@ class BinanceReaderClass {
     }
 
     async getFuturesPrices() {
+        console.log('getFuturesPrices')
         let client = this.client
         let that = this
         return new Promise(async function(resolve, reject){
@@ -71,6 +72,7 @@ class BinanceReaderClass {
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
                     }
                 }
+                console.log('Finding', output)
                 that.findAlerts(output)
                 
                 resolve(output)
@@ -115,6 +117,7 @@ class BinanceReaderClass {
                 })
                 .whereIn('currency', selectedCurrencies)
                 
+            console.log('Alert Limits', alerts)
             let doAlerts = []
             for(const alert of alerts){
                 const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
