@@ -178,10 +178,10 @@ class TaapiReaderClass {
                             this.sendMessage(alert, msg, AlertIndicator)
                     }/*else
                         this.sendMessage(alert, msg, AlertIndicator)*/
-
-                    AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                        AlertCacheLog.logAlertCache(alertCache)
-                    }).catch()
+                    if(result.valueMACD)
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
                 } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
                     console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
