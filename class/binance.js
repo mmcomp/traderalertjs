@@ -109,7 +109,7 @@ class BinanceReaderClass {
                 }
             }
             const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-            console.log(currentDate)
+            // console.log(currentDate)
             // Alert Limit
             let queries = [];
             let alerts = await AlertLimit.query().mergeContext({ queries }).withGraphFetched('user')
@@ -118,8 +118,8 @@ class BinanceReaderClass {
                     query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
                 })
                 .whereIn('currency', selectedCurrencies)
-            console.log('Queries', queries)    
-            console.log('Alert Limits', alerts)
+            // console.log('Queries', queries)    
+            // console.log('Alert Limits', alerts)
             let doAlerts = []
             for(const alert of alerts){
                 const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
