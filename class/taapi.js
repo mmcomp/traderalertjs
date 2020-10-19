@@ -161,6 +161,7 @@ class TaapiReaderClass {
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd') {
+                    console.log('it is macd!', result)
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
