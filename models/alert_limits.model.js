@@ -1,9 +1,10 @@
 'use strict'
 
-const { Model } = require('objection')
+const BaseModel = require('./base.model')
+// const { Model } = require('objection')
 const User = require('./users.model')
  
-class AlertLimit extends Model {
+class AlertLimit extends BaseModel {
   static get tableName () {
     return 'alert_limits'
   }
