@@ -155,7 +155,7 @@ class BinanceReaderClass {
                     doAlerts.push(alert)
                 }
             }
-
+            
             // Alert Area
             alerts = await AlertArea.query().withGraphFetched('user')
                 .where('sent', false)
@@ -194,6 +194,7 @@ class BinanceReaderClass {
     }
 
     async sendAlerts(doAlerts){
+        console.log('Send ALerts', doAlerts)
         return new Promise(async function(resolve, reject){
             for(const alert of doAlerts) {
                 if(alert.target_price){
