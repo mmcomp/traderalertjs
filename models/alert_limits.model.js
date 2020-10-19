@@ -20,7 +20,7 @@ class AlertLimit extends BaseModel {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: 'alert_limits.users_id',
