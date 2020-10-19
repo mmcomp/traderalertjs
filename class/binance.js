@@ -100,6 +100,7 @@ class BinanceReaderClass {
     }
 
     async findAlerts(currencies){
+        console.log('currencies', currencies)
         const that = this
         return new Promise(async function(resolve, reject){
             let selectedCurrencies = []
@@ -119,10 +120,11 @@ class BinanceReaderClass {
                 })
                 .whereIn('currency', selectedCurrencies)
             // console.log('Queries', queries)    
-            // console.log('Alert Limits', alerts)
+            console.log('Alert Limits', alerts)
             let doAlerts = []
             for(const alert of alerts){
                 const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
+                console.log('alertLimitl', alertLimitl)
                 if(typeof alertLimitl!='undefined'){
                     if((alert.type=='up' && currencies[alert.currency]<alert.target_price) || 
                         (alert.type=='down' && currencies[alert.currency]>alert.target_price)){
