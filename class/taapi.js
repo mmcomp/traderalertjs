@@ -189,9 +189,9 @@ class TaapiReaderClass {
                     }
 
                 } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
-                    console.log('BBand found')
+                    // console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    console.log('Current Value', currencyObject)
+                    // console.log('Current Value', currencyObject)
                     let price = null
                     if(currencyObject)
                         price = currencyObject.price
@@ -216,9 +216,9 @@ class TaapiReaderClass {
                     }else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='fibonacciretracement') {
-                    console.log('Fibo found')
+                    // console.log('Fibo found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    console.log('Current Value', currencyObject)
+                    // console.log('Current Value', currencyObject)
                     let price = null
                     if(currencyObject)
                         price = currencyObject.price
