@@ -168,11 +168,12 @@ class BinanceReaderClass {
 
             for(const alert of alerts){
                 const alertLimitl = await AlertAreaLog.query().where('alert_areas_id', alert.id).first()
+                if(alertLimitl) {
+                    const timeDiff = new Date() - new Date(alertLimitl.created_at) / 60000
+                    if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
+                        continue
+                }
                 
-                const timeDiff = new Date() - new Date(alertLimitl.created_at) / 60000
-                if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
-                    continue
-
                 if(typeof alertLimitl!='undefined'){
                     alert.alerted_price = alertLimitl.alerted_price
                     let upPrice = alert.price * (1 + alert.change_percent/100)
