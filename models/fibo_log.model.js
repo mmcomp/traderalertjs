@@ -4,7 +4,7 @@ const { Model } = require('objection')
  
 class FiboLog extends Model {
   static get tableName () {
-    return 'fibos.logs'
+    return 'fibos_logs'
   }
 
   $beforeInsert(context) {
