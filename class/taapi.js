@@ -3,8 +3,9 @@
 const AlertIndicator = require('../models/alert_indicators.model')
 const AlertCache = require('../models/alert_caches.model')
 const AlertCacheLog = require('../models/alert_cache_logs.model')
-const Currency = require('../models/currencies.model')
-const BinanceReaderClass = require('./binance')
+const Currency = require('../models/currencies.model');
+const BBandLog = require('../models/bband_log.model');
+const BinanceReaderClass = require('./binance');
 const fs = require('fs')
 const { exec } = require("child_process")
 const { val } = require('objection')
@@ -196,6 +197,19 @@ class TaapiReaderClass {
                     if(currencyObject)
                         price = currencyObject.price
                     alertCache.result = price
+
+                    console.log('BBAND Log')
+                    var bbandLog = await BBandLog.query().insert({
+                        valueUpperBand: result.valueUpperBand,
+                        valueMiddleBand: result.valueMiddleBand,
+                        valueLowerBand: result.valueLowerBand,
+                        currency: alert.currency,
+                        oldprice: (alertCacheLog)?alertCacheLog.result:null,
+                        price,
+                        user_id: alert.user.id,
+                        telegram_id: alert.user.telegram_id
+                    })
+
                     if(alertCacheLog) {
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
@@ -207,14 +221,27 @@ class TaapiReaderClass {
 
 🕑 ${currentDate} ${currentTime}`
 
-                        if(this.bbandsVerfy(price, alertCacheLog.result, result))
-                            this.sendMessage(alert, msg, AlertIndicator)
+                        if(this.bbandsVerfy(price, alertCacheLog.result, result)){
+                            this.sendMessage(alert, msg, AlertIndicator).catch.
+                                then(res => {
+                                    console.log('BBAND Log update send success')
+                                    await BBandLog.query().where('id', bbandLog.id).update({
+                                        send_result: res
+                                    });
+                                }).catch(err => {
+                                    console.log('BBAND Log update send error')
+                                    await BBandLog.query().where('id', bbandLog.id).update({
+                                        send_result: JSON.stringify(err)
+                                    });
+                                });
+                        }
 
                         AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
                     }else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
+
                 } else if(alert.indicator=='fibonacciretracement') {
                     // console.log('Fibo found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
@@ -254,12 +281,12 @@ class TaapiReaderClass {
             exec(`${process.env.BASE_COMMAND} "${msg}" --chat_id=${alert.user.telegram_id}`, (error, stdout, stderr) => {
                 if (error) {
                     console.log(`error: ${error.message}`);
-                    reject()
+                    reject(error)
                     return
                 }
                 if (stderr) {
                     console.log(`stderr: ${stderr}`);
-                    reject()
+                    reject(stderr)
                     return
                 }
                 console.log(`stdout: ${stdout}`);
@@ -267,7 +294,7 @@ class TaapiReaderClass {
                     alertClass.query().where('id', alert.id).update({
                         sent: true
                     }).then().catch()
-                resolve()
+                resolve(stdout)
             });
         })
     }
