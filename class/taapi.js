@@ -5,6 +5,7 @@ const AlertCache = require('../models/alert_caches.model')
 const AlertCacheLog = require('../models/alert_cache_logs.model')
 const Currency = require('../models/currencies.model');
 const BBandLog = require('../models/bband_log.model');
+const FiboLog = require('../models/fibo_log.model');
 const BinanceReaderClass = require('./binance');
 const fs = require('fs')
 const { exec } = require("child_process")
@@ -222,7 +223,7 @@ class TaapiReaderClass {
 🕑 ${currentDate} ${currentTime}`
 
                         if(this.bbandsVerfy(price, alertCacheLog.result, result)){
-                            this.sendMessage(alert, msg, AlertIndicator).catch.
+                            this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
                                     console.log('BBAND Log update send success')
                                     BBandLog.query().where('id', bbandLog.id).update({
@@ -250,6 +251,17 @@ class TaapiReaderClass {
                     if(currencyObject)
                         price = currencyObject.price
                     alertCache.result = price
+
+                    console.log('FIBO Log')
+                    var fiboLog = await FiboLog.query().insert({
+                        value: result.value,
+                        currency: alert.currency,
+                        oldprice: (alertCacheLog)?alertCacheLog.result:null,
+                        price,
+                        user_id: alert.user.id,
+                        telegram_id: alert.user.telegram_id
+                    })
+
                     if(alertCacheLog) {
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
@@ -261,9 +273,20 @@ class TaapiReaderClass {
 
 🕑 ${currentDate} ${currentTime}`
 
-                        if(this.fiboVerfy(price, alertCacheLog.result, result))
-                            this.sendMessage(alert, msg, AlertIndicator)
-
+                        if(this.fiboVerfy(price, alertCacheLog.result, result)){
+                            this.sendMessage(alert, msg, AlertIndicator).
+                                then(res => {
+                                    console.log('FIBO Log update send success')
+                                    FiboLog.query().where('id', fiboLog.id).update({
+                                        send_result: res
+                                    });
+                                }).catch(err => {
+                                    console.log('FIBO Log update send error')
+                                    FiboLog.query().where('id', fiboLog.id).update({
+                                        send_result: JSON.stringify(err)
+                                    });
+                                });
+                        }
                         AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                             AlertCacheLog.logAlertCache(alertCache)
                         }).catch()
