@@ -225,12 +225,12 @@ class TaapiReaderClass {
                             this.sendMessage(alert, msg, AlertIndicator).catch.
                                 then(res => {
                                     console.log('BBAND Log update send success')
-                                    await BBandLog.query().where('id', bbandLog.id).update({
+                                    BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: res
                                     });
                                 }).catch(err => {
                                     console.log('BBAND Log update send error')
-                                    await BBandLog.query().where('id', bbandLog.id).update({
+                                    BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: JSON.stringify(err)
                                     });
                                 });
