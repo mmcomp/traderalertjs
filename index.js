@@ -41,15 +41,23 @@ const binanceReaderClass = new BinanceReaderClass(binance)
 
 async function binanceRoutine() {
   console.log('Start Binance proccess ....')
-  await binanceReaderClass.getFuturesPrices()
-
+  try{
+    await binanceReaderClass.getFuturesPrices()
+  }catch(e){
+    console.log('Binance Start Error')
+    console.log(e)
+  }
   setTimeout(binanceRoutine, parseInt(process.env.BINANCE_INTERVAL, 10))
 }
 
 async function taapiRoutine() {
   console.log('Start Tapi proccess ....')
-  await taapiReaderClass.readAlerts()
-
+  try{
+    await taapiReaderClass.readAlerts()
+  }catch(e){
+    console.log('Taapi Start Error')
+    console.log(e)
+  }
   setTimeout(taapiRoutine, parseInt(process.env.TAAPI_INTERVAL, 10))
 }
 
