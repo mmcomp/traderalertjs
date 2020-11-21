@@ -17,6 +17,7 @@ class BinanceReaderClass {
 
     async updateCurrency(currency, price){
         return new Promise(async function(resolve, reject){
+            console.log(`Updating ${currency} to ${price}`)
             try{
                 const numUpdated = await Currency.query().patch({
                     price
