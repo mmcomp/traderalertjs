@@ -33,7 +33,7 @@ class TaapiReaderClass {
         const alerts = await AlertCache.query().where('type', 'indicator')
         var indx = 1
         for(var alert of alerts) {
-            console.log(` - Start reading an alert from Tapi ${indx} ....`)
+            // console.log(` - Start reading an alert from Tapi ${indx} ....`)
             await this.readAlert(alert)
             await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
             indx++
@@ -53,7 +53,7 @@ class TaapiReaderClass {
                     fs.writeFileSync(cachePath,  dataToStore)
                 }
             }
-            console.log('Result', result)
+            // console.log('Result', result)
             alert.result = result
             const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
             if(alertCacheLog){
@@ -64,7 +64,7 @@ class TaapiReaderClass {
                 }
                 const timeDiff = (new Date() - new Date(alertCacheLog.created_at)) / 60000
                 // console.log(alertCacheLog.id, new Date(), alertCacheLog.created_at, new Date(alertCacheLog.created_at))
-                console.log('TimeDef', timeDiff)
+                // console.log('TimeDef', timeDiff)
                 // return false
                 if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
                     return false
@@ -80,7 +80,7 @@ class TaapiReaderClass {
                 .where('exchange', alert.exchange)
                 .where('indicator', alert.indicator)
                 .where('timeframe', alert.timeframe)
-            console.log('Sending Alert')
+            // console.log('Sending Alert')
             this.sendAlert(alerts, alertCacheLog, alert)
         }catch(e){
             console.log('indicator Error:', e)
@@ -97,13 +97,13 @@ class TaapiReaderClass {
         const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
         const pastValue = alertCacheLog.result.value
         const currentValue = result.value
-        console.log('RSI : checking from ', pastValue, 'to', currentValue)
+        // console.log('RSI : checking from ', pastValue, 'to', currentValue)
         var res = false
         if((pastValue<(INDICATOR_MAX-INDICATOR_TOLERANCE)) && (currentValue>=INDICATOR_MAX))
             res = true
         else if((pastValue>(INDICATOR_MIN+INDICATOR_TOLERANCE)) && (currentValue<=INDICATOR_MIN))
             res = true
-        console.log('result', res)
+        // console.log('result', res)
         return res
     }
 
@@ -116,7 +116,7 @@ class TaapiReaderClass {
     }
 
     fiboVerfy(price, oldPrice, result) {
-        console.log('Fibo test', price, oldPrice, result)
+        // console.log('Fibo test', price, oldPrice, result)
         if(oldPrice < result.value && price >=result.value)
             return true
         if(oldPrice > result.value && price <=result.value)
@@ -125,11 +125,11 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        console.log('Really sending!', alerts, alertCacheLog, alertCache)
+        // console.log('Really sending!', alerts, alertCacheLog, alertCache)
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
-                console.log('Alert of ', alert.indicator)
+                // console.log('Alert of ', alert.indicator)
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
                     if(alertCacheLog) 
@@ -163,7 +163,7 @@ class TaapiReaderClass {
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd') {
-                    console.log('it is macd!', result)
+                    // console.log('it is macd!', result)
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
@@ -199,7 +199,7 @@ class TaapiReaderClass {
                         price = currencyObject.price
                     alertCache.result = price
 
-                    console.log('BBAND Log')
+                    // console.log('BBAND Log')
                     var bbandLog = await BBandLog.query().insert({
                         valueUpperBand: result.valueUpperBand,
                         valueMiddleBand: result.valueMiddleBand,
@@ -225,12 +225,12 @@ class TaapiReaderClass {
                         if(this.bbandsVerfy(price, alertCacheLog.result, result)){
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
-                                    console.log('BBAND Log update send success')
+                                    // console.log('BBAND Log update send success')
                                     BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: res
                                     });
                                 }).catch(err => {
-                                    console.log('BBAND Log update send error')
+                                    // console.log('BBAND Log update send error')
                                     BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: JSON.stringify(err)
                                     });
@@ -244,15 +244,13 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
 
                 } else if(alert.indicator=='fibonacciretracement') {
-                    // console.log('Fibo found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    // console.log('Current Value', currencyObject)
                     let price = null
                     if(currencyObject)
                         price = currencyObject.price
                     alertCache.result = price
 
-                    console.log('FIBO Log')
+                    // console.log('FIBO Log')
                     var fiboLog = await FiboLog.query().insert({
                         value: result.value,
                         currency: alert.currency,
@@ -276,12 +274,12 @@ class TaapiReaderClass {
                         if(this.fiboVerfy(price, alertCacheLog.result, result)){
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
-                                    console.log('FIBO Log update send success')
+                                    // console.log('FIBO Log update send success')
                                     FiboLog.query().where('id', fiboLog.id).update({
                                         send_result: res
                                     });
                                 }).catch(err => {
-                                    console.log('FIBO Log update send error')
+                                    // console.log('FIBO Log update send error')
                                     FiboLog.query().where('id', fiboLog.id).update({
                                         send_result: JSON.stringify(err)
                                     });
