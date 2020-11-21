@@ -17,7 +17,8 @@ class BinanceReaderClass {
 
     async updateCurrency(currency, price){
         return new Promise(async function(resolve, reject){
-            console.log(`Updating ${currency} to ${price}`)
+            if(currency == 'ADA/USDT')
+                console.log(`Updating ${currency} to ${price}`)
             try{
                 const numUpdated = await Currency.query().patch({
                     price
@@ -37,7 +38,7 @@ class BinanceReaderClass {
     }
 
     async getFuturesPrices() {
-        console.log('getFuturesPrices')
+        // console.log('getFuturesPrices')
         let client = this.client
         let that = this
         return new Promise(async function(resolve, reject){
@@ -73,7 +74,7 @@ class BinanceReaderClass {
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
                     }
                 }
-                console.log('Finding', output)
+                // console.log('Finding', output)
                 that.findAlerts(output)
                 
                 resolve(output)
