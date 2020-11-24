@@ -129,7 +129,6 @@ class TaapiReaderClass {
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
-                console.log('Alert of ', alert.indicator)
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
                     if(alertCacheLog) 
@@ -192,15 +191,15 @@ class TaapiReaderClass {
                     }
 
                 } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
-                    console.log('BBand found')
+                    // console.log('BBand found')
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    console.log('Current Value', currencyObject)
+                    // console.log('Current Value', currencyObject)
                     let price = null
                     if(currencyObject)
                         price = currencyObject.price
                     alertCache.result = price
 
-                    console.log('BBAND Log')
+                    // console.log('BBAND Log')
                     var bbandLog = await BBandLog.query().insert({
                         valueUpperBand: result.valueUpperBand,
                         valueMiddleBand: result.valueMiddleBand,
@@ -226,12 +225,12 @@ class TaapiReaderClass {
                         if(this.bbandsVerfy(price, alertCacheLog.result, result)){
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
-                                    console.log('BBAND Log update send success')
+                                    // console.log('BBAND Log update send success')
                                     BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: res
                                     });
                                 }).catch(err => {
-                                    console.log('BBAND Log update send error')
+                                    // console.log('BBAND Log update send error')
                                     BBandLog.query().where('id', bbandLog.id).update({
                                         send_result: JSON.stringify(err)
                                     });
@@ -245,6 +244,7 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
 
                 } else if(alert.indicator=='fibonacciretracement') {
+                    console.log('Alert of ', alert.indicator, alertCache)
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
                     let price = null
                     if(currencyObject)

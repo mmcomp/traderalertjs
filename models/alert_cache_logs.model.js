@@ -24,7 +24,7 @@ class AlertCacheLog extends Model {
   }
 
   static async logAlertCache(alertCache){
-    console.log('Adding Alert Cache', alertCache)
+    // console.log('Adding Alert Cache', alertCache)
     alertCache.alert_caches_id = alertCache.id
     alertCache.result = (alertCache.result)?JSON.stringify(alertCache.result):alertCache.result
     delete alertCache.id
