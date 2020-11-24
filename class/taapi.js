@@ -156,9 +156,10 @@ class TaapiReaderClass {
                             (pastValue > (INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue <= INDICATOR_MIN) ||
                             (pastValue < (INDICATOR_MAX-INDICATOR_TOLERANCE) && currentValue >= INDICATOR_MAX)
                         )
-                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                                AlertCacheLog.logAlertCache(alertCache)
-                            }).catch()
+
+                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.logAlertCache(alertCache)
+                        }).catch()
                     }
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
