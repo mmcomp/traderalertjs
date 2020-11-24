@@ -24,12 +24,12 @@ class AlertCacheLog extends Model {
   }
 
   static async logAlertCache(alertCache){
+    if(alertCache.id<=0)
+      return null;
+    alertCache.alert_caches_id = alertCache.id
+    alertCache.result = (alertCache.result)?JSON.stringify(alertCache.result):alertCache.result
+    delete alertCache.id
     console.log('Adding Alert Cache', alertCache)
-    // if(alertCache.id<=0)
-    //   return null;
-    // alertCache.alert_caches_id = alertCache.id
-    // alertCache.result = (alertCache.result)?JSON.stringify(alertCache.result):alertCache.result
-    // delete alertCache.id
     // return await AlertCacheLog.query().insert(alertCache)
   }
 }
