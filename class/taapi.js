@@ -244,7 +244,7 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
 
                 } else if(alert.indicator=='fibonacciretracement') {
-                    console.log('Alert of ', alert.indicator, alertCache)
+                    // console.log('Alert of ', alert.indicator, alertCache)
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
                     let price = null
                     if(currencyObject)
