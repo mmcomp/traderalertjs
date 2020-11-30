@@ -70,6 +70,8 @@ class BinanceReaderClass {
                     if(selectedCurrencies[currency]){
                         that.updateCurrency(selectedCurrencies[currency].name, result[currency]).then().catch()
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
+                    }else{
+                        that.updateCurrency(currency, result[currency]).then().catch()
                     }
                 }
                 // console.log('Finding', output)
