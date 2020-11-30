@@ -19,9 +19,14 @@ class TaapiReaderClass {
     async getIndicator(indicator, source, symbol, interval, params, backtrack) {
         source = (source.indexOf("binance")>=0)?"binance":source
         let client = this.client
+        if(!params && indicator=='bbands') {
+            params = {
+                optlnTimePeriod : 20
+            };
+        }
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, source, symbol, interval)
+                let result = await client.getIndicator(indicator, source, symbol, interval, params)
                 resolve(result)
             }catch(e){
                 reject(e)
@@ -214,7 +219,7 @@ class TaapiReaderClass {
                     if(alertCacheLog) {
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
-⚠️ Indicator Alert Boilinger Band
+⚠️ Indicator Alert Bollinger Band
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
