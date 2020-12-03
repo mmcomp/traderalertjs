@@ -114,9 +114,9 @@ class TaapiReaderClass {
 
     bbandsVerfy(price, oldPrice, result) {
         if(oldPrice < result.valueUpperBand && price >=result.valueUpperBand)
-            return true
+            return 'Sell'
         if(oldPrice > result.valueLowerBand && price <=result.valueLowerBand)
-            return true
+            return 'Buy'
         return false
     }
 
@@ -139,13 +139,20 @@ class TaapiReaderClass {
                     if(alertCacheLog) 
                     {
                         if(this.rsiVerfy(alert, alertCacheLog, result)) {
+                            let action = `➡️ Cross Action`;
+                            if(result.value<20)
+                                action = `↗️ Buy Action`;
+                            else if(result.value>80)
+                                action = `↘️ Sell Action`;
                             let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
         
 ⚠️ Indicator Alert RSI
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
-💰 Current Value: ${result.value}
+${action}
+
+💰 Value: ${result.value}
 
 🕑 ${currentDate} ${currentTime}`
                             this.sendMessage(alert, msg, AlertIndicator)
@@ -169,13 +176,20 @@ class TaapiReaderClass {
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd') {
                     // console.log('it is macd!', result)
+                    let action = `➡️ Cross Action`;
+                    if(result.valueMACDHist>0)
+                        action = `↗️ Buy Action`;
+                    else
+                        action = `↘️ Sell Action`;
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert MACD
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
-💰 Current Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
+${action}
+
+💰 Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
 
 🕑 ${currentDate} ${currentTime}`
                     if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
@@ -217,17 +231,20 @@ class TaapiReaderClass {
                     })
 
                     if(alertCacheLog) {
-                        let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-    
+                        var verifyResult = this.bbandsVerfy(price, alertCacheLog.result, result);
+                        if(verifyResult!==false){
+                            let action = `➡️ ${verifyResult} Action`;
+                            let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+        
 ⚠️ Indicator Alert Bollinger Band
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
-💰 Current Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
+${action}
+
+💰 Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
 
 🕑 ${currentDate} ${currentTime}`
-
-                        if(this.bbandsVerfy(price, alertCacheLog.result, result)){
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
                                     // console.log('BBAND Log update send success')
@@ -267,13 +284,16 @@ class TaapiReaderClass {
                     })
 
                     if(alertCacheLog) {
+                        let action = `➡️ 0.618 Cross Action`;
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     
 ⚠️ Indicator Alert Fibonacciretracement
 
 🔊 ${alert.indicator} [${alert.timeframe}]
 
-💰 Current Value:  Value: ${result.value}
+${action}
+
+💰 Value:  Value: ${result.value}
 
 🕑 ${currentDate} ${currentTime}`
 
