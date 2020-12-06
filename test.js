@@ -11,12 +11,13 @@ client.getIndicator("fibonacciretracement", "binance", "BTC/USDT", "4h").then(fu
 
 var axios = require('axios');
 
-axios.get('https://api.taapi.io/rsi', {
+axios.get('https://api.taapi.io/bbands', {
   params: {
     secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0",
     exchange: "binance",
     symbol: "BTC/USDT",
     interval: "1h",
+    optlnTimePeriod: "20"
   }
 })
 .then(function (response) {
