@@ -25,7 +25,8 @@ const knex = Knex({
 Model.knex(knex);
 
 const AlertIndicatorLogic = require('./class/alert_indicator')
-const taapi = require("taapi")
+// const taapi = require("taapi")
+const taapi = require("./class/faketaapi")
 const TaapiReaderClass = require('./class/taapi')
 
 const client = taapi.client(process.env.KEY)
