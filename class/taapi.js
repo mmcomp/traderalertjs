@@ -16,7 +16,7 @@ class TaapiReaderClass {
         this.client = client
     }
 
-    fixCurrency(inp) {
+    static fixCurrency(inp) {
         if(inp.indexOf('/')>0)
             return inp;
 
@@ -40,7 +40,7 @@ class TaapiReaderClass {
         }
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, source, fixCurrency(symbol), interval, params)
+                let result = await client.getIndicator(indicator, source, TaapiReaderClass.fixCurrency(symbol), interval, params)
                 resolve(result)
             }catch(e){
                 reject(e)
