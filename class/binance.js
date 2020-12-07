@@ -9,11 +9,29 @@ const AlertLimitLog = require('../models/alert_limit_logs.model')
 const { exec } = require("child_process")
 const AlertArea = require('../models/alert_areas.model')
 const AlertAreaLog = require('../models/alert_area_logs.model')
-const TaapiReaderClass = require('./taapi');
 
 class BinanceReaderClass {
     constructor (client){
         this.client = client
+    }
+
+    static fixCurrency(inp) {
+        if(inp.indexOf('/')>0)
+            return inp;
+
+        let baseCurrencies = ["BTC","USDT","ETH","BNB","PAX","USDC","TUSD","XRP","RUB","EUR","BUSD","ZAR","BKRW","IDRT","UAH","BIDR","DAI","AUD","GBP"];
+        try{
+            baseCurrencies = JSON.parse(process.env.BASE_CURRENCIES);
+        }catch(e){}
+
+        for(var baseCurrency of baseCurrencies) {
+            if(inp.indexOf(baseCurrency)>0) {
+                var toStr = `/${baseCurrency}`;
+                return inp.replace(baseCurrency, toStr);
+            }
+        }
+
+        return inp;
     }
 
     async updateCurrency(currency, price){
@@ -63,7 +81,7 @@ class BinanceReaderClass {
                     let nm = curr.name
                     selectedCurrencies[nm.replace('/', '')] = {
                         id: curr.id,
-                        name: TaapiReaderClass.fixCurrency(curr.name),
+                        name: BinanceReaderClass.fixCurrency(curr.name),
                     }
                 }
                 
@@ -72,7 +90,7 @@ class BinanceReaderClass {
                         that.updateCurrency(selectedCurrencies[currency].name, result[currency]).then().catch()
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
                     }else{
-                        that.updateCurrency(TaapiReaderClass.fixCurrency(currency), result[currency]).then().catch()
+                        that.updateCurrency(BinanceReaderClass.fixCurrency(currency), result[currency]).then().catch()
                     }
                 }
                 // console.log('Finding', output)
