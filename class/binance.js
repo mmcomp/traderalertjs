@@ -62,7 +62,7 @@ class BinanceReaderClass {
                     let nm = curr.name
                     selectedCurrencies[nm.replace('/', '')] = {
                         id: curr.id,
-                        name: curr.name,
+                        name: TaapiReaderClass.fixCurrency(curr.name),
                     }
                 }
                 
@@ -71,7 +71,7 @@ class BinanceReaderClass {
                         that.updateCurrency(selectedCurrencies[currency].name, result[currency]).then().catch()
                         output[selectedCurrencies[currency].name] = parseFloat(result[currency])
                     }else{
-                        that.updateCurrency(currency, result[currency]).then().catch()
+                        that.updateCurrency(TaapiReaderClass.fixCurrency(currency), result[currency]).then().catch()
                     }
                 }
                 // console.log('Finding', output)

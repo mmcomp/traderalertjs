@@ -65,7 +65,7 @@ async function taapiRoutine() {
 async function start(){
   console.log('Trader Alert Starting ....')
   taapiRoutine()
-  //binanceRoutine()
+  binanceRoutine()
 }
 
 start()
