@@ -9,6 +9,24 @@ client.getIndicator("fibonacciretracement", "binance", "BTC/USDT", "4h").then(fu
 */
 var axios = require('axios');
 class FakeTaapi {
+    static fixCurrency(inp) {
+        console.log('changing', inp);
+        if(inp.indexOf('/')>0)
+            return inp;
+
+        const baseCurrencies = process.env.BASE_CURRENCIES;
+        for(var baseCurrency of baseCurrencies) {
+            if(inp.indexOf(baseCurrency)>0) {
+                var toStr = `/${baseCurrency}`;
+                console.log(inp.replace(baseCurrency, toStr));
+                return inp.replace(baseCurrency, toStr);
+            }
+        }
+
+        console.log(inp);
+        return inp;
+    }
+
     static client(token) {
         return {
             async getIndicator(indicator, source, symbol, interval, params, backtrack) {
@@ -52,7 +70,8 @@ function fixCurrency(inp) {
     }
     return inp;
 }
-
+console.log(FakeTaapi.fixCurrency('BTCUSDT'));
+/*
 const taapi = FakeTaapi;
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0");
 client.getIndicator('bbands', 'binance', fixCurrency('BTCUSDT'), '1h', {optlnTimePeriod: "20"}) .then(response => {
@@ -60,53 +79,4 @@ client.getIndicator('bbands', 'binance', fixCurrency('BTCUSDT'), '1h', {optlnTim
 }).catch(error => {
     console.log(error.response.data);
 })
-/*
-async function getIndicator(indicator, source, symbol, interval, params, backtrack) {
-    let rest_params = {
-        secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0",
-        exchange: source,
-        symbol: symbol,
-        interval: interval
-    };
-    if(params) {
-        for(var key in params)
-            rest_params[key] = params[key];
-    }
-    if(backtrack)
-        rest_params['backtrack'] = backtrack;
-    return new Promise(function(resolve, reject) {
-        axios.get('https://api.taapi.io/' + indicator, {
-            params: rest_params
-        })
-        .then(function (response) {
-            resolve(response);
-        })
-        .catch(function (error) {
-            reject(error);
-        });
-    });
-}
-
-getIndicator('bbands', 'binance', 'BTC/USDT', '1h', {optlnTimePeriod: "20"}) .then(response => {
-    console.log(response.data);
-}).catch(error => {
-    console.log(error.response.data);
-})
-*/
-/*
-axios.get('https://api.taapi.io/bbands', {
-  params: {
-    secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0",
-    exchange: "binance",
-    symbol: "BTC/USDT",
-    interval: "1h",
-    optlnTimePeriod: "20"
-  }
-})
-.then(function (response) {
-  console.log(response.data);
-})
-.catch(function (error) {
-  console.log(error.response.data);
-});
 */
