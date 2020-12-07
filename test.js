@@ -41,9 +41,21 @@ class FakeTaapi {
     }
 }
 
+function fixCurrency(inp) {
+    if(inp.indexOf('/')>0)
+        return inp;
+    const baseCurrencies = ["BTC","USDT","ETH","BNB","PAX","USDC","TUSD","XRP","RUB","EUR","BUSD","ZAR","BKRW","IDRT","UAH","BIDR","DAI","AUD","GBP"];
+    for(var baseCurrency of baseCurrencies) {
+        if(inp.indexOf(baseCurrency)>0) {
+            return inp.replace(baseCurrency, '/' + baseCurrency);
+        }
+    }
+    return inp;
+}
+
 const taapi = FakeTaapi;
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0");
-client.getIndicator('bbands', 'binance', 'BTC/USDT', '1h', {optlnTimePeriod: "20"}) .then(response => {
+client.getIndicator('bbands', 'binance', fixCurrency('BTC/USDT'), '1h', {optlnTimePeriod: "20"}) .then(response => {
     console.log(response.data);
 }).catch(error => {
     console.log(error.response.data);
