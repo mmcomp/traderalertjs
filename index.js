@@ -45,8 +45,8 @@ async function binanceRoutine() {
   try{
     await binanceReaderClass.getFuturesPrices()
   }catch(e){
-    // console.log('Binance Start Error')
-    // console.log(e)
+    console.log('Binance Start Error')
+    console.log(e)
   }
   setTimeout(binanceRoutine, parseInt(process.env.BINANCE_INTERVAL, 10))
 }
