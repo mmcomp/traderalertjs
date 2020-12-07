@@ -17,16 +17,19 @@ class TaapiReaderClass {
     }
 
     static fixCurrency(inp) {
+        console.log('changing', inp);
         if(inp.indexOf('/')>0)
             return inp;
 
         const baseCurrencies = process.env.BASE_CURRENCIES;
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
+                console.log(inp.replace(baseCurrency, '/' + baseCurrency));
                 return inp.replace(baseCurrency, '/' + baseCurrency);
             }
         }
 
+        console.log(inp);
         return inp;
     }
 
