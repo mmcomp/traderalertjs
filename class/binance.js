@@ -9,6 +9,7 @@ const AlertLimitLog = require('../models/alert_limit_logs.model')
 const { exec } = require("child_process")
 const AlertArea = require('../models/alert_areas.model')
 const AlertAreaLog = require('../models/alert_area_logs.model')
+const TaapiReaderClass = require('./taapi');
 
 class BinanceReaderClass {
     constructor (client){

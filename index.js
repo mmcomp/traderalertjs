@@ -41,7 +41,7 @@ const BinanceReaderClass = require('./class/binance')
 const binanceReaderClass = new BinanceReaderClass(binance)
 
 async function binanceRoutine() {
-  // console.log('Start Binance proccess ....')
+  console.log('Start Binance proccess ....')
   try{
     await binanceReaderClass.getFuturesPrices()
   }catch(e){
