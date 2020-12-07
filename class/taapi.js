@@ -40,7 +40,7 @@ class TaapiReaderClass {
         }
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, source, symbol, interval, params)
+                let result = await client.getIndicator(indicator, source, fixCurrency(symbol), interval, params)
                 resolve(result)
             }catch(e){
                 reject(e)
