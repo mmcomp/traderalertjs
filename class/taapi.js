@@ -16,6 +16,20 @@ class TaapiReaderClass {
         this.client = client
     }
 
+    fixCurrency(inp) {
+        if(inp.indexOf('/')>0)
+            return inp;
+
+        const baseCurrencies = process.env.BASE_CURRENCIES;
+        for(var baseCurrency of baseCurrencies) {
+            if(inp.indexOf(baseCurrency)>0) {
+                return inp.replace(baseCurrency, '/' + baseCurrency);
+            }
+        }
+
+        return inp;
+    }
+
     async getIndicator(indicator, source, symbol, interval, params, backtrack) {
         source = (source.indexOf("binance")>=0)?"binance":source
         let client = this.client
