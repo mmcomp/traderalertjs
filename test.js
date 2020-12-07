@@ -1,3 +1,6 @@
+const TaapiReaderClass = require('./class/taapi');
+console.log(TaapiReaderClass);
+
 /*
 const taapi = require("taapi")
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNTkxODEyODczLCJleHAiOjc4OTkwMTI4NzN9.iDJhyuqT2_KR_pTzIgmpt5j4VquaApt_G7QpDZWEkrM")
@@ -7,6 +10,7 @@ client.getIndicator("fibonacciretracement", "binance", "BTC/USDT", "4h").then(fu
     console.log("Result: ", result);
 });
 */
+/*
 var axios = require('axios');
 class FakeTaapi {
     static fixCurrency(inp) {
@@ -71,6 +75,7 @@ function fixCurrency(inp) {
     return inp;
 }
 console.log(FakeTaapi.fixCurrency('BTCUSDT'));
+*/
 /*
 const taapi = FakeTaapi;
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0");
