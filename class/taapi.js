@@ -70,6 +70,7 @@ class TaapiReaderClass {
             if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
                 result = JSON.parse(fs.readFileSync(cachePath))
             else{
+                alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
                 result = await this.getIndicator(alert.indicator, alert.exchange, alert.currency, alert.timeframe.toLowerCase())
                 if(process.env.IS_TEST!='false'){
                     const dataToStore = JSON.stringify(result)
@@ -152,7 +153,6 @@ class TaapiReaderClass {
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
-                alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
                     if(alertCacheLog) 
