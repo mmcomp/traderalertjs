@@ -17,26 +17,21 @@ class TaapiReaderClass {
     }
 
     static fixCurrency(inp) {
-        console.log('changing', inp);
         if(inp.indexOf('/')>0)
             return inp;
 
         let baseCurrencies = ["BTC","USDT","ETH","BNB","PAX","USDC","TUSD","XRP","RUB","EUR","BUSD","ZAR","BKRW","IDRT","UAH","BIDR","DAI","AUD","GBP"];
         try{
             baseCurrencies = JSON.parse(process.env.BASE_CURRENCIES);
-            console.log('bases', baseCurrencies);
         }catch(e){}
+
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
-                console.log('found base ', baseCurrency, 'in', inp.indexOf(baseCurrency));
                 var toStr = `/${baseCurrency}`;
-                console.log('toStr', toStr);
-                console.log(inp.replace(baseCurrency, toStr));
                 return inp.replace(baseCurrency, toStr);
             }
         }
 
-        console.log(inp);
         return inp;
     }
 
@@ -77,7 +72,6 @@ class TaapiReaderClass {
                 result = JSON.parse(fs.readFileSync(cachePath))
             else{
                 alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
-                return null;
                 result = await this.getIndicator(alert.indicator, alert.exchange, alert.currency, alert.timeframe.toLowerCase())
                 if(process.env.IS_TEST!='false'){
                     const dataToStore = JSON.stringify(result)
