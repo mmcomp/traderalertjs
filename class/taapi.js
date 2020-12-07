@@ -21,14 +21,18 @@ class TaapiReaderClass {
         if(inp.indexOf('/')>0)
             return inp;
 
-        const baseCurrencies = process.env.BASE_CURRENCIES;
+        let baseCurrencies = ["BTC","USDT","ETH","BNB","PAX","USDC","TUSD","XRP","RUB","EUR","BUSD","ZAR","BKRW","IDRT","UAH","BIDR","DAI","AUD","GBP"];
+        try{
+            baseCurrencies = JSON.parse(process.env.BASE_CURRENCIES);
+            console.log('bases', baseCurrencies);
+        }catch(e){}
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
                 console.log('found base ', baseCurrency, 'in', inp.indexOf(baseCurrency));
                 var toStr = `/${baseCurrency}`;
                 console.log('toStr', toStr);
-                console.log(inp.replace(baseCurrency, ''));
-                return inp.replace(baseCurrency, '');
+                console.log(inp.replace(baseCurrency, toStr));
+                return inp.replace(baseCurrency, toStr);
             }
         }
 
