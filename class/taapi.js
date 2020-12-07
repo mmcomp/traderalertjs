@@ -24,8 +24,9 @@ class TaapiReaderClass {
         const baseCurrencies = process.env.BASE_CURRENCIES;
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
-                console.log(inp.replace(baseCurrency, '/' + baseCurrency));
-                return inp.replace(baseCurrency, '/' + baseCurrency);
+                var toStr = `/${baseCurrency}`;
+                console.log(inp.replace(baseCurrency, toStr));
+                return inp.replace(baseCurrency, toStr);
             }
         }
 
