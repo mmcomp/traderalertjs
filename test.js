@@ -14,7 +14,7 @@ class FakeTaapi {
         if(inp.indexOf('/')>0)
             return inp;
 
-        const baseCurrencies = process.env.BASE_CURRENCIES;
+        const baseCurrencies = ["BTC","USDT","ETH","BNB","PAX","USDC","TUSD","XRP","RUB","EUR","BUSD","ZAR","BKRW","IDRT","UAH","BIDR","DAI","AUD","GBP"];
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
                 var toStr = `/${baseCurrency}`;
