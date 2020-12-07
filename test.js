@@ -55,7 +55,7 @@ function fixCurrency(inp) {
 
 const taapi = FakeTaapi;
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0");
-client.getIndicator('bbands', 'binance', fixCurrency('BTC/USDT'), '1h', {optlnTimePeriod: "20"}) .then(response => {
+client.getIndicator('bbands', 'binance', fixCurrency('BTCUSDT'), '1h', {optlnTimePeriod: "20"}) .then(response => {
     console.log(response.data);
 }).catch(error => {
     console.log(error.response.data);
