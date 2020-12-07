@@ -24,9 +24,11 @@ class TaapiReaderClass {
         const baseCurrencies = process.env.BASE_CURRENCIES;
         for(var baseCurrency of baseCurrencies) {
             if(inp.indexOf(baseCurrency)>0) {
+                console.log('found base ', baseCurrency, 'in', inp.indexOf(baseCurrency));
                 var toStr = `/${baseCurrency}`;
-                console.log(inp.replace(baseCurrency, toStr));
-                return inp.replace(baseCurrency, toStr);
+                console.log('toStr', toStr);
+                console.log(inp.replace(baseCurrency, ''));
+                return inp.replace(baseCurrency, '');
             }
         }
 
@@ -71,6 +73,7 @@ class TaapiReaderClass {
                 result = JSON.parse(fs.readFileSync(cachePath))
             else{
                 alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
+                return null;
                 result = await this.getIndicator(alert.indicator, alert.exchange, alert.currency, alert.timeframe.toLowerCase())
                 if(process.env.IS_TEST!='false'){
                     const dataToStore = JSON.stringify(result)
