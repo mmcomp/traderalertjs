@@ -44,7 +44,7 @@ class TaapiReaderClass {
         }
         return new Promise(async function(resolve, reject){
             try{
-                let result = await client.getIndicator(indicator, source, TaapiReaderClass.fixCurrency(symbol), interval, params)
+                let result = await client.getIndicator(indicator, source, symbol, interval, params)
                 resolve(result)
             }catch(e){
                 reject(e)
@@ -152,6 +152,7 @@ class TaapiReaderClass {
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
+                alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
                 const {currentDate, currentTime} = BinanceReaderClass.nowDate()
                 if(alert.indicator=='rsi') {
                     if(alertCacheLog) 
