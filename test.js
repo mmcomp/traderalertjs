@@ -1,5 +1,5 @@
 const TaapiReaderClass = require('./class/taapi');
-console.log(TaapiReaderClass);
+console.log(TaapiReaderClass.fixCurrency);
 
 /*
 const taapi = require("taapi")
