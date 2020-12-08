@@ -66,7 +66,7 @@ class TaapiReaderClass {
     
     async readAlert(alert) {
         try{
-            console.log('Currency', alert.currency);
+            console.log('Currency', alert.currency, alert.indicator, alert.timeframe.toLowerCase());
             var result = {}
             const cachePath = process.env.CACHE_PATH + 'Tapi_getIndicator.json'
             if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
