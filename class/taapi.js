@@ -71,8 +71,8 @@ class TaapiReaderClass {
             if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
                 result = JSON.parse(fs.readFileSync(cachePath))
             else{
-                alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
-                result = await this.getIndicator(alert.indicator, alert.exchange, alert.currency, alert.timeframe.toLowerCase())
+                // alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
+                result = await this.getIndicator(alert.indicator, alert.exchange, TaapiReaderClass.fixCurrency(alert.currency), alert.timeframe.toLowerCase())
                 if(process.env.IS_TEST!='false'){
                     const dataToStore = JSON.stringify(result)
                     fs.writeFileSync(cachePath,  dataToStore)
