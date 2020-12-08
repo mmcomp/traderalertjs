@@ -22,7 +22,7 @@ class FakeTaapi {
                     })
                     .then(function (response) {
                         // console.log('taapi result:', response.data);
-                        resolve(response);
+                        resolve(response.data);
                     })
                     .catch(function (error) {
                         // console.log('taapi error:', error.response.data);
