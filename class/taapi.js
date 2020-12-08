@@ -253,7 +253,11 @@ ${action}
 ⚠️ Indicator Alert Bollinger Band
 🔊 ${alert.indicator} [${alert.timeframe}]
 ${action}
-💰 Value:  UpperBand = ${this.twoDecimals(result.valueUpperBand)}, MiddleBand = ${this.twoDecimals(result.valueMiddleBand)}, LowerBand = ${this.twoDecimals(result.valueLowerBand)}, CurrenctPrice = ${this.twoDecimals(price)}
+💰 Value:  
+UpperBand = ${this.twoDecimals(result.valueUpperBand)}
+MiddleBand = ${this.twoDecimals(result.valueMiddleBand)}
+LowerBand = ${this.twoDecimals(result.valueLowerBand)}
+CurrenctPrice = ${this.twoDecimals(price)}
 🕑 ${currentDate} ${currentTime}`
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
