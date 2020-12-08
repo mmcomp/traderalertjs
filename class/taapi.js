@@ -150,6 +150,10 @@ class TaapiReaderClass {
         return false
     }
 
+    twoDecimals(num) {
+        return (Math.round(num * 100) / 100).toFixed(2);
+    }
+
     async sendAlert(alerts, alertCacheLog, alertCache) {
         // console.log('Really sending!', alerts, alertCacheLog, alertCache)
         const result = alertCache.result
@@ -166,15 +170,10 @@ class TaapiReaderClass {
                             else if(result.value>80)
                                 action = `↘️ Sell Action`;
                             let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-        
 ⚠️ Indicator Alert RSI
-
 🔊 ${alert.indicator} [${alert.timeframe}]
-
 ${action}
-
-💰 Value: ${result.value}
-
+💰 Value: ${this.twoDecimals(result.value)}
 🕑 ${currentDate} ${currentTime}`
                             this.sendMessage(alert, msg, AlertIndicator)
                         }
@@ -203,15 +202,10 @@ ${action}
                     else
                         action = `↘️ Sell Action`;
                     let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-    
 ⚠️ Indicator Alert MACD
-
 🔊 ${alert.indicator} [${alert.timeframe}]
-
 ${action}
-
-💰 Value:  MACD = ${result.valueMACD}, MACDSignal = ${result.valueMACDSignal}, MACDHist = ${result.valueMACDHist}
-
+💰 Value:  MACD = ${this.twoDecimals(result.valueMACD)}, MACDSignal = ${this.twoDecimals(result.valueMACDSignal)}, MACDHist = ${this.twoDecimals(result.valueMACDHist)}
 🕑 ${currentDate} ${currentTime}`
                     if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
                         const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
@@ -256,15 +250,10 @@ ${action}
                         if(verifyResult!==false){
                             let action = `➡️ ${verifyResult} Action`;
                             let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-        
 ⚠️ Indicator Alert Bollinger Band
-
 🔊 ${alert.indicator} [${alert.timeframe}]
-
 ${action}
-
-💰 Value:  UpperBand = ${result.valueUpperBand}, MiddleBand = ${result.valueMiddleBand}, LowerBand = ${result.valueLowerBand}, CurrenctPrice = ${price}
-
+💰 Value:  UpperBand = ${this.twoDecimals(result.valueUpperBand)}, MiddleBand = ${this.twoDecimals(result.valueMiddleBand)}, LowerBand = ${this.twoDecimals(result.valueLowerBand)}, CurrenctPrice = ${this.twoDecimals(price)}
 🕑 ${currentDate} ${currentTime}`
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
@@ -307,17 +296,11 @@ ${action}
                     if(alertCacheLog) {
                         let action = `➡️ 0.618 Cross Action`;
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-    
 ⚠️ Indicator Alert Fibonacciretracement
-
 🔊 ${alert.indicator} [${alert.timeframe}]
-
 ${action}
-
-💰 Value:  Value: ${result.value}
-
+💰 Value:  Value: ${this.twoDecimals(result.value)}
 🕑 ${currentDate} ${currentTime}`
-
                         if(this.fiboVerfy(price, alertCacheLog.result, result)){
                             this.sendMessage(alert, msg, AlertIndicator).
                                 then(res => {
