@@ -151,7 +151,21 @@ class TaapiReaderClass {
     }
 
     twoDecimals(num) {
-        return (Math.round(num * 100) / 100).toFixed(2);
+        if(num>=1)
+            return (Math.round(num * 100) / 100).toFixed(2);
+        
+        let noneZeroLocation;
+        let tmpNum = num;
+        let levelCount = 0;
+        while(!noneZeroLocation) {
+            tmpNum *= 10;
+            if(tmpNum>=1)
+                noneZeroLocation = levelCount;
+            levelCount++;
+        }
+        let res = (Math.round(tmpNum * 10) / 100).toFixed(2);
+        res = res /(Math.pow(10 , levelCount-1));
+        return res;
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {

@@ -1,6 +1,27 @@
+function twoDecimals(num) {
+    if(num>=1)
+        return (Math.round(num * 100) / 100).toFixed(2);
+    
+    let noneZeroLocation;
+    let tmpNum = num;
+    let levelCount = 0;
+    while(!noneZeroLocation) {
+        tmpNum *= 10;
+        if(tmpNum>=1)
+            noneZeroLocation = levelCount;
+        levelCount++;
+    }
+    let res = (Math.round(tmpNum * 10) / 100).toFixed(2);
+    res = res /(Math.pow(10 , levelCount-1));
+    return res;
+}
+
+console.log(twoDecimals(10.2568));
+console.log(twoDecimals(0.000001068));
+/*
 const TaapiReaderClass = require('./class/taapi');
 console.log(TaapiReaderClass.fixCurrency);
-
+*/
 /*
 const taapi = require("taapi")
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNTkxODEyODczLCJleHAiOjc4OTkwMTI4NzN9.iDJhyuqT2_KR_pTzIgmpt5j4VquaApt_G7QpDZWEkrM")
