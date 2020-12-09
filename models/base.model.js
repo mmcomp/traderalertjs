@@ -2,6 +2,7 @@
 const { Model } = require('objection')
 
 class BaseModel extends Model {
+  /*
     static query(...args) {
       return super.query(...args).onBuildKnex((knexQueryBuilder, builder) => {
         knexQueryBuilder.on('query', queryData => {
@@ -12,6 +13,7 @@ class BaseModel extends Model {
         });
       });
     }
+  */
 }
 
 module.exports = BaseModel

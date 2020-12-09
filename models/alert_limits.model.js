@@ -1,7 +1,7 @@
 'use strict'
 
-const BaseModel = require('./base.model')
-// const { Model } = require('objection')
+// const BaseModel = require('./base.model')
+const { Model } = require('objection')
 const User = require('./users.model')
  
 class AlertLimit extends BaseModel {
@@ -20,7 +20,8 @@ class AlertLimit extends BaseModel {
 
   static relationMappings = {
     user: {
-      relation: BaseModel.BelongsToOneRelation,
+      // relation: BaseModel.BelongsToOneRelation,
+      relation: Model.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: 'alert_limits.users_id',
