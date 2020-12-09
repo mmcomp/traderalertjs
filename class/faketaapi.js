@@ -26,7 +26,7 @@ class FakeTaapi {
                     })
                     .catch(function (error) {
                         // console.log('taapi error:', error.response.data);
-                        reject(error.response.data);
+                        reject(error);
                     });
                 });
             }
