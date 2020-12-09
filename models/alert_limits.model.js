@@ -4,7 +4,7 @@
 const { Model } = require('objection')
 const User = require('./users.model')
  
-class AlertLimit extends BaseModel {
+class AlertLimit extends Model {
   static get tableName () {
     return 'alert_limits'
   }
