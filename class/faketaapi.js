@@ -15,17 +15,17 @@ class FakeTaapi {
                 }
                 if(backtrack)
                     rest_params['backtrack'] = backtrack;
-                console.log('taapi req:', indicator, rest_params);
+                // console.log('taapi req:', indicator, rest_params);
                 return new Promise(function(resolve, reject) {
                     axios.get('https://api.taapi.io/' + indicator, {
                         params: rest_params
                     })
                     .then(function (response) {
-                        console.log('taapi result:', response.data);
+                        // console.log('taapi result:', response.data);
                         resolve(response.data);
                     })
                     .catch(function (error) {
-                        console.log('taapi error:', error.response.data);
+                        // console.log('taapi error:', error.response.data);
                         reject(error);
                     });
                 });
