@@ -99,18 +99,23 @@ class TaapiReaderClass {
                 return false
         }
         
-        return;
         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-        const alerts = await AlertIndicator.query().withGraphFetched('user')
-            .where('sent', false)
-            .where(function(query) {
-                query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
-            })
-            .where('currency', alert.currency)
-            .where('exchange', alert.exchange)
-            .where('indicator', alert.indicator)
-            .where('timeframe', alert.timeframe)
+        try{
+            const alerts = await AlertIndicator.query().withGraphFetched('user')
+                .where('sent', false)
+                .where(function(query) {
+                    query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
+                })
+                .where('currency', alert.currency)
+                .where('exchange', alert.exchange)
+                .where('indicator', alert.indicator)
+                .where('timeframe', alert.timeframe)
+        }catch(e) {
+            console.log('E', e)
+        }
+
         // console.log('Sending Alert')
+        return;
         this.sendAlert(alerts, alertCacheLog, alert)
     }
 
