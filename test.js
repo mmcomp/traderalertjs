@@ -1,3 +1,4 @@
+/*
 function twoDecimals(num) {
     if(num>=1)
         return (Math.round(num * 100) / 100).toFixed(2);
@@ -18,6 +19,7 @@ function twoDecimals(num) {
 
 console.log(twoDecimals(10.2568));
 console.log(twoDecimals(0.000001068));
+*/
 /*
 const TaapiReaderClass = require('./class/taapi');
 console.log(TaapiReaderClass.fixCurrency);
@@ -97,12 +99,11 @@ function fixCurrency(inp) {
 }
 console.log(FakeTaapi.fixCurrency('BTCUSDT'));
 */
-/*
+
 const taapi = FakeTaapi;
 const client = taapi.client("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImhzY29tcDIwMDJAZ21haWwuY29tIiwiaWF0IjoxNjA3MjQ3Njc0LCJleHAiOjc5MTQ0NDc2NzR9.xcflcz0alaq4aRwHK95FkzsHbg1TiHYIVTjX9o8Vwe0");
-client.getIndicator('bbands', 'binance', fixCurrency('BTCUSDT'), '1h', {optlnTimePeriod: "20"}) .then(response => {
+client.getIndicator('bbands', 'binance', fixCurrency('ERD/USDT'), '15m', {optlnTimePeriod: "20"}) .then(response => {
     console.log(response.data);
 }).catch(error => {
     console.log(error.response.data);
 })
-*/
