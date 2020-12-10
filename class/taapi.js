@@ -82,7 +82,6 @@ class TaapiReaderClass {
                 fs.writeFileSync(cachePath,  dataToStore)
             }
         }
-        return;
         //console.log('Result', result)
         alert.result = result
         const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
@@ -100,6 +99,7 @@ class TaapiReaderClass {
                 return false
         }
         
+        return;
         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
         const alerts = await AlertIndicator.query().withGraphFetched('user')
             .where('sent', false)
