@@ -58,63 +58,59 @@ class TaapiReaderClass {
         var indx = 1
         for(var alert of alerts) {
             console.log(` - Start reading an alert from Tapi ${indx} of ${alerts.length} ....`)
-            try {
-                await this.readAlert(alert)
-            }catch(e) {
-                console.log('Read error', e)
-            }
+            await this.readAlert(alert)
             await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
             indx++
         }
     }
     
     async readAlert(alert) {
-        try{
-            // console.log('Currency', alert.currency, alert.indicator, alert.timeframe.toLowerCase());
-            var result = {}
-            const cachePath = process.env.CACHE_PATH + 'Tapi_getIndicator.json'
-            if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
-                result = JSON.parse(fs.readFileSync(cachePath))
-            else{
-                // alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
+        // console.log('Currency', alert.currency, alert.indicator, alert.timeframe.toLowerCase());
+        var result = {}
+        const cachePath = process.env.CACHE_PATH + 'Tapi_getIndicator.json'
+        if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
+            result = JSON.parse(fs.readFileSync(cachePath))
+        else{
+            // alert.currency = TaapiReaderClass.fixCurrency(alert.currency);
+            try{
                 result = await this.getIndicator(alert.indicator, alert.exchange, TaapiReaderClass.fixCurrency(alert.currency), alert.timeframe.toLowerCase())
-                if(process.env.IS_TEST!='false'){
-                    const dataToStore = JSON.stringify(result)
-                    fs.writeFileSync(cachePath,  dataToStore)
-                }
+            }catch(e){
+                console.log('indicator Error:', e)
             }
-            //console.log('Result', result)
-            alert.result = result
-            const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
-            if(alertCacheLog){
-                try{
-                    alertCacheLog.result = JSON.parse(alertCacheLog.result)
-                }catch(e){
-                    alertCacheLog.result = null
-                }
-                const timeDiff = (new Date() - new Date(alertCacheLog.created_at)) / 60000
-                // console.log(alertCacheLog.id, new Date(), alertCacheLog.created_at, new Date(alertCacheLog.created_at))
-                // console.log('TimeDef', timeDiff)
-                // return false
-                if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
-                    return false
+            if(process.env.IS_TEST!='false'){
+                const dataToStore = JSON.stringify(result)
+                fs.writeFileSync(cachePath,  dataToStore)
             }
-            
-            const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-            const alerts = await AlertIndicator.query().withGraphFetched('user')
-                .where('sent', false)
-                .where(function(query) {
-                    query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
-                })
-                .where('currency', alert.currency)
-                .where('exchange', alert.exchange)
-                .where('indicator', alert.indicator)
-                .where('timeframe', alert.timeframe)
-            // console.log('Sending Alert')
-            this.sendAlert(alerts, alertCacheLog, alert)
-        }catch(e){
-            console.log('indicator Error:', e)
         }
+        //console.log('Result', result)
+        alert.result = result
+        const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
+        if(alertCacheLog){
+            try{
+                alertCacheLog.result = JSON.parse(alertCacheLog.result)
+            }catch(e){
+                alertCacheLog.result = null
+            }
+            const timeDiff = (new Date() - new Date(alertCacheLog.created_at)) / 60000
+            // console.log(alertCacheLog.id, new Date(), alertCacheLog.created_at, new Date(alertCacheLog.created_at))
+            // console.log('TimeDef', timeDiff)
+            // return false
+            if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
+                return false
+        }
+        
+        const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+        const alerts = await AlertIndicator.query().withGraphFetched('user')
+            .where('sent', false)
+            .where(function(query) {
+                query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
+            })
+            .where('currency', alert.currency)
+            .where('exchange', alert.exchange)
+            .where('indicator', alert.indicator)
+            .where('timeframe', alert.timeframe)
+        // console.log('Sending Alert')
+        this.sendAlert(alerts, alertCacheLog, alert)
     }
 
     compareWithTolerance(value, base, tolerance) {
