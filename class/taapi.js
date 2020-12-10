@@ -59,7 +59,7 @@ class TaapiReaderClass {
         for(var alert of alerts) {
             console.log(` - Start reading an alert from Tapi ${indx} of ${alerts.length} ....`)
             // await this.readAlert(alert)
-            // await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
+            await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
             indx++
         }
     }
