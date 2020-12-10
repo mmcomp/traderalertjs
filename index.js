@@ -64,10 +64,16 @@ async function taapiRoutine() {
 
 async function start(){
   console.log('Trader Alert Starting ....')
-  taapiRoutine()
-  binanceRoutine()
+  try{
+    taapiRoutine()
+  }catch(e) {
+    console.log('Tappi Total Error', e)
+  }
+  try{
+    binanceRoutine()
+  }catch(e) {
+    console.log('Binance Total Error', e)
+  }
 }
 
-start().then().catch(err => {
-  console.log('total error', err);
-});
+start()
