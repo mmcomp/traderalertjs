@@ -66,7 +66,7 @@ class TaapiReaderClass {
     
     async readAlert(alert) {
         try{
-            console.log('Currency', alert.currency, alert.indicator, alert.timeframe.toLowerCase());
+            // console.log('Currency', alert.currency, alert.indicator, alert.timeframe.toLowerCase());
             var result = {}
             const cachePath = process.env.CACHE_PATH + 'Tapi_getIndicator.json'
             if(process.env.IS_TEST!='false' && fs.existsSync(cachePath))
@@ -79,7 +79,7 @@ class TaapiReaderClass {
                     fs.writeFileSync(cachePath,  dataToStore)
                 }
             }
-            console.log('Result', result)
+            //console.log('Result', result)
             alert.result = result
             const alertCacheLog = await AlertCacheLog.query().where('alert_caches_id', alert.id).first()
             if(alertCacheLog){
