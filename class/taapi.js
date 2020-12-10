@@ -212,7 +212,7 @@ ${action}
                     else
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd') {
-                    console.log('it is macd!', result)
+                    // console.log('it is macd!', result)
                     let action = `➡️ Cross Action`;
                     if(result.valueMACDHist>0)
                         action = `↗️ Buy Action`;
