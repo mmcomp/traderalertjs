@@ -170,7 +170,7 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        // console.log('Really sending!', alerts, alertCacheLog, alertCache)
+        console.log('Really sending!', alerts, alertCacheLog, alertCache)
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
@@ -295,7 +295,7 @@ CurrenctPrice = ${this.twoDecimals(price)}
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
 
                 } else if(alert.indicator=='fibonacciretracement') {
-                    console.log('Alert of ', alert.indicator, alertCache)
+                    // console.log('Alert of ', alert.indicator, alertCache)
                     const currencyObject = await Currency.query().where('name', alert.currency).first()
                     let price = null
                     if(currencyObject)
@@ -304,7 +304,6 @@ CurrenctPrice = ${this.twoDecimals(price)}
 
 
                     // console.log('FIBO Log')
-                    /*
                     var fiboLog = await FiboLog.query().insert({
                         value: result.value,
                         currency: alert.currency,
@@ -313,7 +312,6 @@ CurrenctPrice = ${this.twoDecimals(price)}
                         user_id: alert.user.id,
                         telegram_id: alert.user.telegram_id
                     })
-                    */
 
                     if(alertCacheLog) {
                         let action = `➡️ 0.618 Cross Action`;
