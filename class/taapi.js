@@ -152,8 +152,10 @@ class TaapiReaderClass {
     }
 
     twoDecimals(num) {
+        const sign = parseInt(num)/(Math.abs(parseInt(num)))
+        num = Math.abs(num);
         if(num>=1)
-            return (Math.round(num * 100) / 100).toFixed(2);
+            return sign * (Math.round(num * 100) / 100).toFixed(2);
         
         let noneZeroLocation;
         let tmpNum = num;
@@ -166,7 +168,7 @@ class TaapiReaderClass {
         }
         let res = (Math.round(tmpNum * 10) / 100).toFixed(2);
         res = res /(Math.pow(10 , levelCount-1));
-        return res;
+        return sign * res;
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
@@ -211,7 +213,6 @@ ${action}
                         AlertCacheLog.logAlertCache(alertCache).then().catch()
                 } else if(alert.indicator=='macd') {
                     console.log('it is macd!', result)
-                    continue;
                     let action = `➡️ Cross Action`;
                     if(result.valueMACDHist>0)
                         action = `↗️ Buy Action`;
