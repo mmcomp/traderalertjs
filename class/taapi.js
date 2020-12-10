@@ -100,22 +100,17 @@ class TaapiReaderClass {
         }
         
         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-        try{
-            const alerts = await AlertIndicator.query().withGraphFetched('user')
-                .where('sent', false)
-                .where(function(query) {
-                    query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
-                })
-                .where('currency', alert.currency)
-                .where('exchange', alert.exchange)
-                .where('indicator', alert.indicator)
-                .where('timeframe', alert.timeframe)
-        }catch(e) {
-            console.log('E', e)
-        }
+        const alerts = await AlertIndicator.query().withGraphFetched('user')
+            .where('sent', false)
+            .where(function(query) {
+                query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
+            })
+            .where('currency', alert.currency)
+            .where('exchange', alert.exchange)
+            .where('indicator', alert.indicator)
+            .where('timeframe', alert.timeframe)
 
         // console.log('Sending Alert')
-        return;
         this.sendAlert(alerts, alertCacheLog, alert)
     }
 
@@ -175,7 +170,8 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        // console.log('Really sending!', alerts, alertCacheLog, alertCache)
+        console.log('Really sending!', alerts, alertCacheLog, alertCache)
+        return;
         const result = alertCache.result
         for(const alert of alerts) {
             if(alert.user.telegram_id) {
