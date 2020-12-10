@@ -222,7 +222,7 @@ ${action}
 ${action}
 💰 Value:  MACD = ${this.twoDecimals(result.valueMACD)}, MACDSignal = ${this.twoDecimals(result.valueMACDSignal)}, MACDHist = ${this.twoDecimals(result.valueMACDHist)}
 🕑 ${currentDate} ${currentTime}`
-                    return;
+                    continue;
                     if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
                         const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
                         const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
