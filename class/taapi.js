@@ -223,7 +223,7 @@ ${action}
 ⚠️ Indicator Alert MACD
 🔊 ${alert.indicator} [${alert.timeframe}]
 ${action}
-💰 Value:  MACD = ${this.twoDecimals(result.valueMACD)}, MACDSignal = ${this.twoDecimals(result.valueMACDSignal)}, MACDHist = ${this.twoDecimals(result.valueMACDHist)}
+💰 Value:  MACD = ${result.valueMACD}[${this.twoDecimals(result.valueMACD)}], MACDSignal = ${result.valueMACDSignal}[${this.twoDecimals(result.valueMACDSignal)}], MACDHist = ${result.valueMACDHist}[${this.twoDecimals(result.valueMACDHist)}]
 🕑 ${currentDate} ${currentTime}`
                     if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
                         const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
