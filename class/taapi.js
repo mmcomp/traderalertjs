@@ -152,11 +152,11 @@ class TaapiReaderClass {
     }
 
     twoDecimals(num) {
-        const sign = parseInt(num)/(Math.abs(parseInt(num)))
+        const sign = num/(Math.abs(num))
         num = Math.abs(num);
         if(num>=1)
             return sign * (Math.round(num * 100) / 100).toFixed(2);
-        
+    
         let noneZeroLocation;
         let tmpNum = num;
         let levelCount = 0;
@@ -166,8 +166,9 @@ class TaapiReaderClass {
                 noneZeroLocation = levelCount;
             levelCount++;
         }
+        const level = Math.pow(10 , levelCount-1);
         let res = (Math.round(tmpNum * 10) / 100).toFixed(2);
-        res = res /(Math.pow(10 , levelCount-1));
+        res = res /level;
         return sign * res;
     }
 

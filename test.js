@@ -1,8 +1,10 @@
-/*
+
 function twoDecimals(num) {
+    const sign = num/(Math.abs(num))
+    num = Math.abs(num);
     if(num>=1)
-        return (Math.round(num * 100) / 100).toFixed(2);
-    
+        return sign * (Math.round(num * 100) / 100).toFixed(2);
+
     let noneZeroLocation;
     let tmpNum = num;
     let levelCount = 0;
@@ -12,14 +14,15 @@ function twoDecimals(num) {
             noneZeroLocation = levelCount;
         levelCount++;
     }
+    const level = Math.pow(10 , levelCount-1);
     let res = (Math.round(tmpNum * 10) / 100).toFixed(2);
-    res = res /(Math.pow(10 , levelCount-1));
-    return res;
+    res = res /level;
+    return sign * res;
 }
 
-console.log(twoDecimals(10.2568));
-console.log(twoDecimals(0.000001068));
-*/
+console.log(twoDecimals(-10.2568));
+console.log(twoDecimals(-0.000001068));
+
 /*
 const TaapiReaderClass = require('./class/taapi');
 console.log(TaapiReaderClass.fixCurrency);
@@ -33,7 +36,7 @@ client.getIndicator("fibonacciretracement", "binance", "BTC/USDT", "4h").then(fu
     console.log("Result: ", result);
 });
 */
-
+/*
 var axios = require('axios');
 class FakeTaapi {
     static fixCurrency(inp) {
@@ -105,3 +108,4 @@ client.getIndicator('bbands', 'binance', fixCurrency('ERD/USDT'), '15m', {optlnT
 }).catch(error => {
     console.log(error.response.data);
 })
+*/
