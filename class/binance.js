@@ -39,7 +39,7 @@ class BinanceReaderClass {
             try{
                 const numUpdated = await Currency.query().patch({
                     price
-                }).where('name', currency)
+                }).skipUndefined().where('name', currency)
 
                 if(numUpdated<=0){
                     await Currency.query().insert({
@@ -136,7 +136,7 @@ class BinanceReaderClass {
             // console.log(currentDate)
             // Alert Limit
             let queries = [];
-            let alerts = await AlertLimit.query().mergeContext({ queries }).withGraphFetched('user')
+            let alerts = await AlertLimit.query().mergeContext({ queries }).withGraphFetched('user').skipUndefined()
                 .where('sent', false)
                 .where(function(query) {
                     query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
@@ -146,27 +146,27 @@ class BinanceReaderClass {
             // console.log('Alert Limits', alerts)
             let doAlerts = []
             for(const alert of alerts){
-                const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).first()
+                const alertLimitl = await AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).first()
                 // console.log('alertLimitl', alertLimitl)
                 if(typeof alertLimitl!='undefined'){
                     if((alert.type=='up' && currencies[alert.currency]<alert.target_price) || 
                         (alert.type=='down' && currencies[alert.currency]>alert.target_price)){
                         alert['alerted_price'] = currencies[alert.currency]
-                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
                         continue
                     }
                     if((alert.type=='up' && currencies[alert.currency]>alert.target_price && alertLimitl.alerted_price>alert.target_price) || 
                         (alert.type=='down' && currencies[alert.currency]<alert.target_price && alertLimitl.alerted_price<alert.target_price)){
                         alert['alerted_price'] = currencies[alert.currency]
-                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
                         continue
                     }
                     if(alert.type=='cross' && ((currencies[alert.currency]>alert.target_price && alertLimitl.alerted_price>alert.target_price) || (currencies[alert.currency]<alert.target_price && alertLimitl.alerted_price<alert.target_price))){
                         alert['alerted_price'] = currencies[alert.currency]
-                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
+                        AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).delete().then(res=>{AlertLimitLog.logAlertLimit(alert)}).catch(e=>{})
                         continue
                     }else{
-                        AlertLimitLog.query().where('alert_limits_id', alert.id).delete().then(res=>{}).catch(e=>{})
+                        AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).delete().then(res=>{}).catch(e=>{})
                     }
                 }
                 if(alert.target_price<currencies[alert.currency] && alert.type=='up'){
@@ -182,7 +182,7 @@ class BinanceReaderClass {
             }
             
             // Alert Area
-            alerts = await AlertArea.query().withGraphFetched('user')
+            alerts = await AlertArea.query().withGraphFetched('user').skipUndefined()
                 .where('sent', false)
                 .where(function(query) {
                     query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
@@ -190,7 +190,7 @@ class BinanceReaderClass {
                 .whereIn('currency', selectedCurrencies)
 
             for(const alert of alerts){
-                const alertLimitl = await AlertAreaLog.query().where('alert_areas_id', alert.id).first()
+                const alertLimitl = await AlertAreaLog.query().skipUndefined().where('alert_areas_id', alert.id).first()
                 if(alertLimitl) {
                     const timeDiff = new Date() - new Date(alertLimitl.created_at) / 60000
                     if(timeDiff < parseInt(process.env.ALERT_LIFETIME_MINUTES, 10))
@@ -209,7 +209,7 @@ class BinanceReaderClass {
                         doAlerts.push(alert)
                     }
                 }
-                AlertAreaLog.query().where('alert_areas_id', alert.id).delete().then(res=>{AlertAreaLog.logAlertArea(alert)}).catch(e=>{console.log(e)})
+                AlertAreaLog.query().skipUndefined().where('alert_areas_id', alert.id).delete().then(res=>{AlertAreaLog.logAlertArea(alert)}).catch(e=>{console.log(e)})
             }
     
             if(doAlerts.length>0){
@@ -227,10 +227,10 @@ class BinanceReaderClass {
                     if(alert.notification=='single'){
                         AlertLimit.query().patch({
                             sent: true,
-                        }).where('id', alert.id).then().catch()
+                        }).skipUndefined().where('id', alert.id).then().catch()
                     }
                     
-                    const alertLimitl = await AlertLimitLog.query().where('alert_limits_id', alert.id).where('alerted_price', alert.alerted_price).first()
+                    const alertLimitl = await AlertLimitLog.query().skipUndefined().where('alert_limits_id', alert.id).where('alerted_price', alert.alerted_price).first()
     
                     if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
                         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
@@ -260,10 +260,10 @@ class BinanceReaderClass {
                     if(alert.notification=='single'){
                         AlertArea.query().patch({
                             sent: true,
-                        }).where('id', alert.id).then().catch()
+                        }).skipUndefined().where('id', alert.id).then().catch()
                     }
                     
-                    const alertLimitl = await AlertAreaLog.query().where('alert_areas_id', alert.id).where('alerted_price', alert.alerted_price).first()
+                    const alertLimitl = await AlertAreaLog.query().skipUndefined().where('alert_areas_id', alert.id).where('alerted_price', alert.alerted_price).first()
     
                     if(alert.user.telegram_id && typeof alertLimitl=='undefined'){
                         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
