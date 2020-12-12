@@ -76,6 +76,7 @@ class TaapiReaderClass {
                 result = await this.getIndicator(alert.indicator, alert.exchange, TaapiReaderClass.fixCurrency(alert.currency), alert.timeframe.toLowerCase())
             }catch(e){
                 console.log('indicator Error:', e)
+                return ;
             }
             if(process.env.IS_TEST!='false'){
                 const dataToStore = JSON.stringify(result)
