@@ -54,13 +54,17 @@ class TaapiReaderClass {
     }
 
     async readAlerts() {
-        const alerts = await AlertCache.query().where('type', 'indicator')
-        var indx = 1
-        for(var alert of alerts) {
-            console.log(` - Start reading an alert from Tapi ${indx} of ${alerts.length} ....`)
-            await this.readAlert(alert)
-            await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
-            indx++
+        try{
+            const alerts = await AlertCache.query().where('type', 'indicator')
+            var indx = 1
+            for(var alert of alerts) {
+                console.log(` - Start reading an alert from Tapi ${indx} of ${alerts.length} ....`)
+                await this.readAlert(alert)
+                await new Promise(r => setTimeout(r, parseInt(process.env.TAAPI_REQUEST_INTERVAL, 10)));
+                indx++
+            }    
+        }catch(e){
+            console.log('readAlerts error: ', e)
         }
     }
     
@@ -101,7 +105,8 @@ class TaapiReaderClass {
         }
         
         const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-        const alerts = await AlertIndicator.query().withGraphFetched('user')
+        try{
+            const alerts = await AlertIndicator.query().withGraphFetched('user')
             .where('sent', false)
             .where(function(query) {
                 query.where('expire_date', '>', currentDate).orWhere('expire_date', null).orWhere('expire_date', '').orWhere('expire_date', '0000-00-00 00:00:00')
@@ -112,7 +117,12 @@ class TaapiReaderClass {
             .where('timeframe', alert.timeframe)
 
         // console.log('Sending Alert')
-        this.sendAlert(alerts, alertCacheLog, alert)
+            this.sendAlert(alerts, alertCacheLog, alert).then().catch(error => {
+                console.log('sendAlert error', error)
+            })
+        }catch(e){
+            console.log('readAlert error', e)
+        }
     }
 
     compareWithTolerance(value, base, tolerance) {
@@ -174,180 +184,183 @@ class TaapiReaderClass {
     }
 
     async sendAlert(alerts, alertCacheLog, alertCache) {
-        // console.log('Really sending!', alerts, alertCacheLog, alertCache)
-        const result = alertCache.result
-        for(const alert of alerts) {
-            if(alert.user.telegram_id) {
-                const {currentDate, currentTime} = BinanceReaderClass.nowDate()
-                if(alert.indicator=='rsi') {
-                    if(alertCacheLog) 
-                    {
-                        if(this.rsiVerfy(alert, alertCacheLog, result)) {
-                            let action = `➡️ Cross Action`;
-                            if(result.value<20)
-                                action = `↗️ Buy Action`;
-                            else if(result.value>80)
-                                action = `↘️ Sell Action`;
-                            let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-⚠️ Indicator Alert RSI
-🔊 ${alert.indicator} [${alert.timeframe}]
-${action}
-💰 Value: ${this.twoDecimals(result.value)}
-🕑 ${currentDate} ${currentTime}`
-                            this.sendMessage(alert, msg, AlertIndicator)
-                        }
-                        const INDICATOR_MAX = parseInt(process.env.INDICATOR_MAX, 10)
-                        const INDICATOR_MIN = parseInt(process.env.INDICATOR_MIN, 10)
-                        const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
-                        const pastValue = alertCacheLog.result.value
-                        const currentValue = result.value
-                        if( currentValue<(INDICATOR_MIN - INDICATOR_TOLERANCE) || currentValue>(INDICATOR_MAX+INDICATOR_TOLERANCE) || 
-                            (currentValue>(INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue<(INDICATOR_MAX - INDICATOR_TOLERANCE)) ||
-                            (pastValue > (INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue <= INDICATOR_MIN) ||
-                            (pastValue < (INDICATOR_MAX-INDICATOR_TOLERANCE) && currentValue >= INDICATOR_MAX)
-                        )
+        try{
+            // console.log('Really sending!', alerts, alertCacheLog, alertCache)
+            const result = alertCache.result
+            for(const alert of alerts) {
+                if(alert.user.telegram_id) {
+                    const {currentDate, currentTime} = BinanceReaderClass.nowDate()
+                    if(alert.indicator=='rsi') {
+                        if(alertCacheLog) 
+                        {
+                            if(this.rsiVerfy(alert, alertCacheLog, result)) {
+                                let action = `➡️ Cross Action`;
+                                if(result.value<20)
+                                    action = `↗️ Buy Action`;
+                                else if(result.value>80)
+                                    action = `↘️ Sell Action`;
+                                let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    ⚠️ Indicator Alert RSI
+    🔊 ${alert.indicator} [${alert.timeframe}]
+    ${action}
+    💰 Value: ${this.twoDecimals(result.value)}
+    🕑 ${currentDate} ${currentTime}`
+                                this.sendMessage(alert, msg, AlertIndicator)
+                            }
+                            const INDICATOR_MAX = parseInt(process.env.INDICATOR_MAX, 10)
+                            const INDICATOR_MIN = parseInt(process.env.INDICATOR_MIN, 10)
+                            const INDICATOR_TOLERANCE = parseInt(process.env.INDICATOR_TOLERANCE, 10)
+                            const pastValue = alertCacheLog.result.value
+                            const currentValue = result.value
+                            if( currentValue<(INDICATOR_MIN - INDICATOR_TOLERANCE) || currentValue>(INDICATOR_MAX+INDICATOR_TOLERANCE) || 
+                                (currentValue>(INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue<(INDICATOR_MAX - INDICATOR_TOLERANCE)) ||
+                                (pastValue > (INDICATOR_MIN+INDICATOR_TOLERANCE) && currentValue <= INDICATOR_MIN) ||
+                                (pastValue < (INDICATOR_MAX-INDICATOR_TOLERANCE) && currentValue >= INDICATOR_MAX)
+                            )
 
-                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                            AlertCacheLog.logAlertCache(alertCache)
-                        }).catch()
-                    }
-                    else
-                        AlertCacheLog.logAlertCache(alertCache).then().catch()
-                } else if(alert.indicator=='macd') {
-                    // console.log('it is macd!', result)
-                    let action = `➡️ Cross Action`;
-                    if(result.valueMACDHist>0)
-                        action = `↗️ Buy Action`;
-                    else
-                        action = `↘️ Sell Action`;
-                    let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-⚠️ Indicator Alert MACD
-🔊 ${alert.indicator} [${alert.timeframe}]
-${action}
-💰 Value:  MACD = ${result.valueMACD}[${this.twoDecimals(result.valueMACD)}], MACDSignal = ${result.valueMACDSignal}[${this.twoDecimals(result.valueMACDSignal)}], MACDHist = ${result.valueMACDHist}[${this.twoDecimals(result.valueMACDHist)}]
-🕑 ${currentDate} ${currentTime}`
-                    if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
-                        const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
-                        const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
-                        if(currentPol!=pastPol)
-                            this.sendMessage(alert, msg, AlertIndicator)
-                    }/*else
-                        this.sendMessage(alert, msg, AlertIndicator)*/
-                    if(result.valueMACD){
-                        if(alertCacheLog){
                             AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
                             }).catch()
-                        }else {
+                        }
+                        else
                             AlertCacheLog.logAlertCache(alertCache).then().catch()
-                        }
-                    }
-
-                } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
-                    // console.log('BBand found')
-                    const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    // console.log('Current Value', currencyObject)
-                    let price = null
-                    if(currencyObject)
-                        price = currencyObject.price
-                    alertCache.result = price
-
-                    // console.log('BBAND Log')
-                    var bbandLog = await BBandLog.query().insert({
-                        valueUpperBand: result.valueUpperBand,
-                        valueMiddleBand: result.valueMiddleBand,
-                        valueLowerBand: result.valueLowerBand,
-                        currency: alert.currency,
-                        oldprice: (alertCacheLog)?alertCacheLog.result:null,
-                        price,
-                        user_id: alert.user.id,
-                        telegram_id: alert.user.telegram_id
-                    })
-
-                    if(alertCacheLog) {
-                        var verifyResult = this.bbandsVerfy(price, alertCacheLog.result, result);
-                        if(verifyResult!==false){
-                            let action = `➡️ ${verifyResult} Action`;
-                            let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-⚠️ Indicator Alert Bollinger Band
-🔊 ${alert.indicator} [${alert.timeframe}]
-${action}
-💰 Value:  
-UpperBand = ${this.twoDecimals(result.valueUpperBand)}
-MiddleBand = ${this.twoDecimals(result.valueMiddleBand)}
-LowerBand = ${this.twoDecimals(result.valueLowerBand)}
-CurrenctPrice = ${this.twoDecimals(price)}
-🕑 ${currentDate} ${currentTime}`
-                            this.sendMessage(alert, msg, AlertIndicator).
-                                then(res => {
-                                    // console.log('BBAND Log update send success')
-                                    BBandLog.query().where('id', bbandLog.id).update({
-                                        send_result: res
-                                    });
-                                }).catch(err => {
-                                    // console.log('BBAND Log update send error')
-                                    BBandLog.query().where('id', bbandLog.id).update({
-                                        send_result: JSON.stringify(err)
-                                    });
-                                });
-                        }
-
-                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                            AlertCacheLog.logAlertCache(alertCache)
-                        }).catch()
-                    }else
-                        AlertCacheLog.logAlertCache(alertCache).then().catch()
-
-                } else if(alert.indicator=='fibonacciretracement') {
-                    // console.log('Alert of ', alert.indicator, alertCache)
-                    const currencyObject = await Currency.query().where('name', alert.currency).first()
-                    let price = null
-                    if(currencyObject)
-                        price = currencyObject.price
-                    alertCache.result = price
-
-
-                    // console.log('FIBO Log')
-                    var fiboLog = await FiboLog.query().insert({
-                        value: result.value,
-                        currency: alert.currency,
-                        oldprice: (alertCacheLog)?alertCacheLog.result:null,
-                        price,
-                        user_id: alert.user.id,
-                        telegram_id: alert.user.telegram_id
-                    })
-
-                    if(alertCacheLog) {
-                        let action = `➡️ 0.618 Cross Action`;
+                    } else if(alert.indicator=='macd') {
+                        // console.log('it is macd!', result)
+                        let action = `➡️ Cross Action`;
+                        if(result.valueMACDHist>0)
+                            action = `↗️ Buy Action`;
+                        else
+                            action = `↘️ Sell Action`;
                         let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
-⚠️ Indicator Alert Fibonacciretracement
-🔊 ${alert.indicator} [${alert.timeframe}]
-${action}
-💰 Value:  Value: ${this.twoDecimals(result.value)}
-🕑 ${currentDate} ${currentTime}`
-                        if(this.fiboVerfy(price, alertCacheLog.result, result)){
-                            this.sendMessage(alert, msg, AlertIndicator).
-                                then(res => {
-                                    // console.log('FIBO Log update send success')
-                                    FiboLog.query().where('id', fiboLog.id).update({
-                                        send_result: res
-                                    });
-                                }).catch(err => {
-                                    // console.log('FIBO Log update send error')
-                                    FiboLog.query().where('id', fiboLog.id).update({
-                                        send_result: JSON.stringify(err)
-                                    });
-                                });
+    ⚠️ Indicator Alert MACD
+    🔊 ${alert.indicator} [${alert.timeframe}]
+    ${action}
+    💰 Value:  MACD = ${result.valueMACD}[${this.twoDecimals(result.valueMACD)}], MACDSignal = ${result.valueMACDSignal}[${this.twoDecimals(result.valueMACDSignal)}], MACDHist = ${result.valueMACDHist}[${this.twoDecimals(result.valueMACDHist)}]
+    🕑 ${currentDate} ${currentTime}`
+                        if(alertCacheLog && alertCacheLog.result && result.valueMACDHist!=0 && alertCacheLog.result.valueMACDHist!=0){
+                            const currentPol = Math.abs(result.valueMACDHist)/result.valueMACDHist
+                            const pastPol = Math.abs(alertCacheLog.result.valueMACDHist)/alertCacheLog.result.valueMACDHist
+                            if(currentPol!=pastPol)
+                                this.sendMessage(alert, msg, AlertIndicator)
+                        }/*else
+                            this.sendMessage(alert, msg, AlertIndicator)*/
+                        if(result.valueMACD){
+                            if(alertCacheLog){
+                                AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                    AlertCacheLog.logAlertCache(alertCache)
+                                }).catch()
+                            }else {
+                                AlertCacheLog.logAlertCache(alertCache).then().catch()
+                            }
                         }
-                        AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
-                            AlertCacheLog.logAlertCache(alertCache)
-                        }).catch()
-                    }else
-                        AlertCacheLog.logAlertCache(alertCache).then().catch()
+
+                    } else if(alert.indicator=='bbands' || alert.indicator=='bbands2') {
+                        // console.log('BBand found')
+                        const currencyObject = await Currency.query().where('name', alert.currency).first()
+                        // console.log('Current Value', currencyObject)
+                        let price = null
+                        if(currencyObject)
+                            price = currencyObject.price
+                        alertCache.result = price
+
+                        // console.log('BBAND Log')
+                        var bbandLog = await BBandLog.query().insert({
+                            valueUpperBand: result.valueUpperBand,
+                            valueMiddleBand: result.valueMiddleBand,
+                            valueLowerBand: result.valueLowerBand,
+                            currency: alert.currency,
+                            oldprice: (alertCacheLog)?alertCacheLog.result:null,
+                            price,
+                            user_id: alert.user.id,
+                            telegram_id: alert.user.telegram_id
+                        })
+
+                        if(alertCacheLog) {
+                            var verifyResult = this.bbandsVerfy(price, alertCacheLog.result, result);
+                            if(verifyResult!==false){
+                                let action = `➡️ ${verifyResult} Action`;
+                                let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    ⚠️ Indicator Alert Bollinger Band
+    🔊 ${alert.indicator} [${alert.timeframe}]
+    ${action}
+    💰 Value:  
+    UpperBand = ${this.twoDecimals(result.valueUpperBand)}
+    MiddleBand = ${this.twoDecimals(result.valueMiddleBand)}
+    LowerBand = ${this.twoDecimals(result.valueLowerBand)}
+    CurrenctPrice = ${this.twoDecimals(price)}
+    🕑 ${currentDate} ${currentTime}`
+                                this.sendMessage(alert, msg, AlertIndicator).
+                                    then(res => {
+                                        // console.log('BBAND Log update send success')
+                                        BBandLog.query().where('id', bbandLog.id).update({
+                                            send_result: res
+                                        });
+                                    }).catch(err => {
+                                        // console.log('BBAND Log update send error')
+                                        BBandLog.query().where('id', bbandLog.id).update({
+                                            send_result: JSON.stringify(err)
+                                        });
+                                    });
+                            }
+
+                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                AlertCacheLog.logAlertCache(alertCache)
+                            }).catch()
+                        }else
+                            AlertCacheLog.logAlertCache(alertCache).then().catch()
+
+                    } else if(alert.indicator=='fibonacciretracement') {
+                        // console.log('Alert of ', alert.indicator, alertCache)
+                        const currencyObject = await Currency.query().where('name', alert.currency).first()
+                        let price = null
+                        if(currencyObject)
+                            price = currencyObject.price
+                        alertCache.result = price
+
+
+                        // console.log('FIBO Log')
+                        var fiboLog = await FiboLog.query().insert({
+                            value: result.value,
+                            currency: alert.currency,
+                            oldprice: (alertCacheLog)?alertCacheLog.result:null,
+                            price,
+                            user_id: alert.user.id,
+                            telegram_id: alert.user.telegram_id
+                        })
+
+                        if(alertCacheLog) {
+                            let action = `➡️ 0.618 Cross Action`;
+                            let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
+    ⚠️ Indicator Alert Fibonacciretracement
+    🔊 ${alert.indicator} [${alert.timeframe}]
+    ${action}
+    💰 Value: ${this.twoDecimals(result.value)}
+    🕑 ${currentDate} ${currentTime}`
+                            if(this.fiboVerfy(price, alertCacheLog.result, result)){
+                                this.sendMessage(alert, msg, AlertIndicator).
+                                    then(res => {
+                                        // console.log('FIBO Log update send success')
+                                        FiboLog.query().where('id', fiboLog.id).update({
+                                            send_result: res
+                                        });
+                                    }).catch(err => {
+                                        // console.log('FIBO Log update send error')
+                                        FiboLog.query().where('id', fiboLog.id).update({
+                                            send_result: JSON.stringify(err)
+                                        });
+                                    });
+                            }
+                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                AlertCacheLog.logAlertCache(alertCache)
+                            }).catch()
+                        }else
+                            AlertCacheLog.logAlertCache(alertCache).then().catch()
+                    }
                 }
             }
+        }catch(e){
+            console.log('sendAlert all error:', e)
         }
-
     }
 
     async sendMessage(alert, msg, alertClass) {
