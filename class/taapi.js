@@ -150,7 +150,7 @@ class TaapiReaderClass {
             return 'Sell'
         if(oldPrice > result.valueLowerBand && price <=result.valueLowerBand)
             return 'Buy'
-        return false
+        return false;
     }
 
     fiboVerfy(price, oldPrice, result) {
@@ -278,7 +278,10 @@ class TaapiReaderClass {
                         if(alertCacheLog) {
                             var verifyResult = this.bbandsVerfy(price, alertCacheLog.result, result);
                             if(verifyResult!==false){
-                                let action = `➡️ ${verifyResult} Action`;
+                                let sign = '↘️';
+                                if(sign=='Sell')
+                                    sign = '↗️';
+                                let action = `${sign} ${verifyResult} Action`;
                                 let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
     ⚠️ Indicator Alert Bollinger Band
     🔊 ${alert.indicator} [${alert.timeframe}]
