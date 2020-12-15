@@ -279,7 +279,7 @@ class TaapiReaderClass {
                             var verifyResult = this.bbandsVerfy(price, alertCacheLog.result, result);
                             if(verifyResult!==false){
                                 let sign = '↘️';
-                                if(sign=='Sell')
+                                if(sign=='Buy')
                                     sign = '↗️';
                                 let action = `${sign} ${verifyResult} Action`;
                                 let msg = `♦️ ${alert.currency.replace('/', ' / ')} 
