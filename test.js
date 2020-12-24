@@ -1,4 +1,4 @@
-
+/*
 function twoDecimals(num) {
     const sign = num/(Math.abs(num))
     num = Math.abs(num);
@@ -22,7 +22,7 @@ function twoDecimals(num) {
 
 console.log(twoDecimals(-10.2568));
 console.log(twoDecimals(-0.000001068));
-
+*/
 /*
 const TaapiReaderClass = require('./class/taapi');
 console.log(TaapiReaderClass.fixCurrency);
