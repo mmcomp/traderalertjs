@@ -218,7 +218,7 @@ class TaapiReaderClass {
                                 (pastValue < (INDICATOR_MAX-INDICATOR_TOLERANCE) && currentValue >= INDICATOR_MAX)
                             )
 
-                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.query().where('id', alertCacheLog.alert_caches_id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
                             }).catch()
                         }
@@ -246,7 +246,7 @@ class TaapiReaderClass {
                             this.sendMessage(alert, msg, AlertIndicator)*/
                         if(result.valueMACD){
                             if(alertCacheLog){
-                                AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                                AlertCacheLog.query().where('id', alertCacheLog.alert_caches_id).delete().then(res => {
                                     AlertCacheLog.logAlertCache(alertCache)
                                 }).catch()
                             }else {
@@ -306,7 +306,7 @@ class TaapiReaderClass {
                                     });
                             }
 
-                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.query().where('id', alertCacheLog.alert_caches_id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
                             }).catch()
                         }else
@@ -353,7 +353,7 @@ class TaapiReaderClass {
                                         });
                                     });
                             }
-                            AlertCacheLog.query().where('id', alertCacheLog.id).delete().then(res => {
+                            AlertCacheLog.query().where('id', alertCacheLog.alert_caches_id).delete().then(res => {
                                 AlertCacheLog.logAlertCache(alertCache)
                             }).catch()
                         }else
